@@ -1,0 +1,31 @@
+#  https://github.com/prometheus-community/postgres_exporter - экспортер метрик для постгреса
+
+version: "3.8"
+services:
+  crowd-db:
+    image: postgres:17.4-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=crowd-db
+    volumes:
+      - type: volume
+        source: crowd-db-data
+        target: /var/lib/postgresql/data
+      - ./postgresql-crowd-db.conf:/etc/postgresql.conf:ro
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d crowd-db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    command: -c config_file=/etc/postgresql.conf
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 4G
+volumes:
+  crowd-db-data:

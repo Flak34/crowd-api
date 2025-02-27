@@ -1,0 +1,21 @@
+syntax = "proto3";
+package crowd.api.v1;
+option go_package = "github.com/Flak34/crowd-api;crowd_api_v1";
+
+import "google/api/annotations.proto";
+
+service CrowdAPIV1 {
+  rpc Ping(PingRequest) returns (PingResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/ping"
+    };
+  }
+}
+
+message PingRequest {
+
+}
+
+message PingResponse {
+
+}
