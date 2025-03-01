@@ -5,6 +5,7 @@ import (
 	crowdapiv1 "github.com/Flak34/crowd-api/internal/app/crowd/api/v1"
 	crowd_api_v1 "github.com/Flak34/crowd-api/internal/pb/crowd-api-v1"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -14,15 +15,21 @@ import (
 )
 
 const (
-	dsn               = ""
+	dsn               = "postgres://postgres:postgres@localhost:5434/crowd-db"
 	grpcServerAddress = "localhost:7002"
 	httpServerAddress = ":7000"
 )
 
 func main() {
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	dbpool, err := pgxpool.New(ctx, dsn)
+	if err != nil {
+		log.Fatalf("failed to initialize pg pool: %v", err)
+	}
+	defer dbpool.Close()
+	//ep := entrypoint.New(dbpool)
 
 	// Setup and start gRPC server
 	go func() {
