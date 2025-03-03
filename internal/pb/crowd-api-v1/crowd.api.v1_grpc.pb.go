@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	CrowdAPIV1_Ping_FullMethodName = "/crowd.api.v1.CrowdAPIV1/Ping"
+	CrowdAPIV1_Ping_FullMethodName                  = "/crowd.api.v1.CrowdAPIV1/Ping"
+	CrowdAPIV1_ResolveTasksByProject_FullMethodName = "/crowd.api.v1.CrowdAPIV1/ResolveTasksByProject"
 )
 
 // CrowdAPIV1Client is the client API for CrowdAPIV1 service.
@@ -27,6 +28,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CrowdAPIV1Client interface {
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
+	// Get tasks by project id. This method reserves tasks for the user.
+	ResolveTasksByProject(ctx context.Context, in *ResolveTasksByProjectRequest, opts ...grpc.CallOption) (*ResolveTasksByProjectResponse, error)
 }
 
 type crowdAPIV1Client struct {
@@ -46,11 +49,22 @@ func (c *crowdAPIV1Client) Ping(ctx context.Context, in *PingRequest, opts ...gr
 	return out, nil
 }
 
+func (c *crowdAPIV1Client) ResolveTasksByProject(ctx context.Context, in *ResolveTasksByProjectRequest, opts ...grpc.CallOption) (*ResolveTasksByProjectResponse, error) {
+	out := new(ResolveTasksByProjectResponse)
+	err := c.cc.Invoke(ctx, CrowdAPIV1_ResolveTasksByProject_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CrowdAPIV1Server is the server API for CrowdAPIV1 service.
 // All implementations must embed UnimplementedCrowdAPIV1Server
 // for forward compatibility
 type CrowdAPIV1Server interface {
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
+	// Get tasks by project id. This method reserves tasks for the user.
+	ResolveTasksByProject(context.Context, *ResolveTasksByProjectRequest) (*ResolveTasksByProjectResponse, error)
 	mustEmbedUnimplementedCrowdAPIV1Server()
 }
 
@@ -60,6 +74,9 @@ type UnimplementedCrowdAPIV1Server struct {
 
 func (UnimplementedCrowdAPIV1Server) Ping(context.Context, *PingRequest) (*PingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
+}
+func (UnimplementedCrowdAPIV1Server) ResolveTasksByProject(context.Context, *ResolveTasksByProjectRequest) (*ResolveTasksByProjectResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResolveTasksByProject not implemented")
 }
 func (UnimplementedCrowdAPIV1Server) mustEmbedUnimplementedCrowdAPIV1Server() {}
 
@@ -92,6 +109,24 @@ func _CrowdAPIV1_Ping_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CrowdAPIV1_ResolveTasksByProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResolveTasksByProjectRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CrowdAPIV1Server).ResolveTasksByProject(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CrowdAPIV1_ResolveTasksByProject_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CrowdAPIV1Server).ResolveTasksByProject(ctx, req.(*ResolveTasksByProjectRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CrowdAPIV1_ServiceDesc is the grpc.ServiceDesc for CrowdAPIV1 service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +137,10 @@ var CrowdAPIV1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Ping",
 			Handler:    _CrowdAPIV1_Ping_Handler,
+		},
+		{
+			MethodName: "ResolveTasksByProject",
+			Handler:    _CrowdAPIV1_ResolveTasksByProject_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

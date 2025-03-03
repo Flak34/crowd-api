@@ -5,10 +5,10 @@ CREATE TABLE IF NOT EXISTS task (
     project_id INTEGER NOT NULL,
     target_overlap INTEGER NOT NULL,
     current_overlap INTEGER NOT  NULL,
-    active_annotators_ids TEXT[],
+    active_annotators_ids INTEGER[],
     input_data JSONB NOT NULL,
     output_data JSONB,
-    time_to_annotate INTERVAL NOT NULL,
+    max_annotation_time INTERVAL NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
     annotated_at TIMESTAMPTZ,
     deleted_at TIMESTAMPTZ
@@ -17,24 +17,34 @@ CREATE INDEX project_id_idx ON task(project_id);
 
 CREATE TABLE IF NOT EXISTS project (
     id SERIAL PRIMARY KEY,
-    creator_id TEXT,
-    description TEXT,
-    target_overlap INTEGER,
+    creator_id INTEGER NOT NULL,
+    description TEXT NOT NULL,
+    task_config JSONB NOT NULL,
+    target_overlap INTEGER NOT NULL,
+    tasks_per_user INTEGER NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc')
 );
 
 CREATE TABLE IF NOT EXISTS task_annotation (
-    task_id INTEGER,
+    task_id INTEGER NOT NULL,
     annotator_id TEXT NOT NULL,
-    started_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
     deadline TIMESTAMPTZ,
     finished_at TIMESTAMPTZ,
     output_data JSONB,
     PRIMARY KEY (task_id, annotator_id)
 );
+
+CREATE TABLE IF NOT EXISTS project_annotator (
+  project_id INTEGER NOT NULL,
+  annotator_id INTEGER NOT NULL,
+  task_ids INTEGER[] NOT NULL ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+  PRIMARY KEY (project_id, annotator_id)
+);
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS task, project, task_annotation;
+DROP TABLE IF EXISTS task, project, task_annotation, project_annotator;
 -- +goose StatementEnd

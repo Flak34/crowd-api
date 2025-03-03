@@ -3,7 +3,11 @@ package main
 import (
 	"context"
 	crowdapiv1 "github.com/Flak34/crowd-api/internal/app/crowd/api/v1"
+	"github.com/Flak34/crowd-api/internal/entrypoint"
 	crowd_api_v1 "github.com/Flak34/crowd-api/internal/pb/crowd-api-v1"
+	project_repository "github.com/Flak34/crowd-api/internal/project/repository"
+	task_repository "github.com/Flak34/crowd-api/internal/task/repository"
+	task_service "github.com/Flak34/crowd-api/internal/task/service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
@@ -29,7 +33,10 @@ func main() {
 		log.Fatalf("failed to initialize pg pool: %v", err)
 	}
 	defer dbpool.Close()
-	//ep := entrypoint.New(dbpool)
+	ep := entrypoint.New(dbpool)
+	taskRepo := task_repository.New()
+	projectRepo := project_repository.New()
+	taskService := task_service.New(ep, taskRepo, projectRepo)
 
 	// Setup and start gRPC server
 	go func() {
@@ -38,7 +45,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("failed to listen: %v", err)
 		}
-		crowdAPIV1Service := crowdapiv1.NewCrowdAPIV1()
+		crowdAPIV1Service := crowdapiv1.NewCrowdAPIV1(taskService)
 		crowd_api_v1.RegisterCrowdAPIV1Server(grpcServer, crowdAPIV1Service)
 		reflection.Register(grpcServer)
 		if err = grpcServer.Serve(listener); err != nil {
