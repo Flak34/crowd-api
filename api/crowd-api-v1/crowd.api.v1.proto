@@ -3,6 +3,7 @@ package crowd.api.v1;
 option go_package = "github.com/Flak34/crowd-api;crowd_api_v1";
 
 import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
 
 service CrowdAPIV1 {
   rpc Ping(PingRequest) returns (PingResponse) {
@@ -10,12 +11,33 @@ service CrowdAPIV1 {
       get: "/api/v1/ping"
     };
   }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Tasks
+
+  // Get tasks by project id. This method reserves tasks for the user.
+  rpc ResolveTasksByProject(ResolveTasksByProjectRequest) returns (ResolveTasksByProjectResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/tasks/{project_id}/resolve_by_project"
+    };
+  }
 }
 
-message PingRequest {
+message PingRequest {}
 
+message PingResponse {}
+
+message ResolveTasksByProjectRequest {
+  int32 project_id = 1;
+  int32 user_id = 2;
 }
 
-message PingResponse {
+message ResolveTasksByProjectResponse {
+  repeated UserTask tasks = 1;
+}
 
+message UserTask {
+  int32 id = 1;
+  string input_data = 2;
+  google.protobuf.Timestamp deadline = 3;
 }

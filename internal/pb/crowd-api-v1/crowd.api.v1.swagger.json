@@ -37,6 +37,45 @@
           "CrowdAPIV1"
         ]
       }
+    },
+    "/api/v1/tasks/{projectId}/resolve_by_project": {
+      "get": {
+        "summary": "Get tasks by project id. This method reserves tasks for the user.",
+        "operationId": "CrowdAPIV1_ResolveTasksByProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ResolveTasksByProjectResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "CrowdAPIV1"
+        ]
+      }
     }
   },
   "definitions": {
@@ -70,6 +109,34 @@
     },
     "v1PingResponse": {
       "type": "object"
+    },
+    "v1ResolveTasksByProjectResponse": {
+      "type": "object",
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserTask"
+          }
+        }
+      }
+    },
+    "v1UserTask": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "inputData": {
+          "type": "string"
+        },
+        "deadline": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
     }
   }
 }
