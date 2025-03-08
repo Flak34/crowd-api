@@ -19,7 +19,6 @@ func (r *Repository) ListTasks(ctx context.Context, db entrypoint.Database, task
 		    active_annotators_ids, 
 		    input_data,
 		    output_data,
-		    max_annotation_time,
 		    created_at
 		FROM task
 		WHERE id = ANY($1::INTEGER[])`

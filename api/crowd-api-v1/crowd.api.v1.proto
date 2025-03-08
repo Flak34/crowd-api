@@ -15,10 +15,10 @@ service CrowdAPIV1 {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Tasks
 
-  // Get tasks by project id. This method reserves tasks for the user.
+  // Resolve user tasks by project id. This method reserves tasks for the user or returns already reserved ones.
   rpc ResolveTasksByProject(ResolveTasksByProjectRequest) returns (ResolveTasksByProjectResponse) {
     option (google.api.http) = {
-      get: "/api/v1/tasks/{project_id}/resolve_by_project"
+      post: "/api/v1/tasks/{project_id}/resolve_by_project"
     };
   }
 }

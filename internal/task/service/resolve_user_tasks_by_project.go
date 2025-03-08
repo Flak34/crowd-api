@@ -5,12 +5,16 @@ import (
 	"github.com/Flak34/crowd-api/internal/entrypoint"
 	dberrors "github.com/Flak34/crowd-api/internal/errors/storage_errors"
 	ucerrors "github.com/Flak34/crowd-api/internal/errors/usecase_errors"
+	"github.com/Flak34/crowd-api/internal/pgqueue"
 	projectmodel "github.com/Flak34/crowd-api/internal/project/model"
 	projectrepo "github.com/Flak34/crowd-api/internal/project/repository"
 	model "github.com/Flak34/crowd-api/internal/task/model"
 	taskrepo "github.com/Flak34/crowd-api/internal/task/repository"
+	"github.com/jackc/pgx/v5"
 	"github.com/pkg/errors"
+	"github.com/riverqueue/river"
 	"github.com/samber/lo"
+	"time"
 )
 
 func (s *Service) ResolveUserTasksByProject(ctx context.Context, projectID int, userID int) ([]model.Task, error) {
@@ -19,14 +23,14 @@ func (s *Service) ResolveUserTasksByProject(ctx context.Context, projectID int, 
 	if err != nil {
 		return nil, err
 	}
-	reservedTasks, err := s.listUserTasksByProject(ctx, db, userID, projectID)
+	reservedTasks, err := s.listUserTasks(ctx, db, userID, projectID)
 	if err != nil {
 		return nil, err
 	}
 	if len(reservedTasks) != 0 {
 		return reservedTasks, nil
 	}
-	err = s.ep.TxWrapper(ctx, func(ctx context.Context, tx entrypoint.Database) error {
+	err = s.ep.TxWrapper(ctx, func(ctx context.Context, tx pgx.Tx) error {
 		reservedTasks, err = s.taskRepo.ReserveTasks(ctx, tx, taskrepo.ReserveTasksDTO{
 			UserID:    userID,
 			ProjectID: projectID,
@@ -48,11 +52,11 @@ func (s *Service) ResolveUserTasksByProject(ctx context.Context, projectID int, 
 		if err != nil {
 			return err
 		}
-		// TODO заюзать эту штуку https://riverqueue.com/ и в транзакции добавлять отложенную задачу на
-		// обработку дедлайна по задачам пользака. В очереди нужно убирать пользака из active_annotators_ids
-		// и увеличивать current_overlap, если он решил задачу. Если не решил, оставлять его таким же,
-		// после чего задача сможет быть выдана другому пользователю.
-		return nil
+		_, err = s.pgqClient.InsertTx(ctx, tx, pgqueue.AnnotationDeadlineArgs{
+			ProjectID:   projectID,
+			AnnotatorID: userID,
+		}, &river.InsertOpts{ScheduledAt: time.Now().Add(project.AnnotatorTimeLimit)})
+		return err
 	})
 	if err != nil {
 		return reservedTasks, err
@@ -76,7 +80,7 @@ func (s *Service) getProject(
 	return project, nil
 }
 
-func (s *Service) listUserTasksByProject(
+func (s *Service) listUserTasks(
 	ctx context.Context,
 	db entrypoint.Database,
 	userID int,

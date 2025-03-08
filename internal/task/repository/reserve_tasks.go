@@ -35,7 +35,6 @@ func (r *Repository) ReserveTasks(
             active_annotators_ids, 
             input_data, 
             output_data,
-			max_annotation_time, 
             created_at;`
 	var tasks []*TaskTable
 	err := pgxscan.Select(ctx, db, &tasks, query, dto.UserID, dto.ProjectID, dto.Limit)

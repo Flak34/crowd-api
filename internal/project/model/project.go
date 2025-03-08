@@ -5,13 +5,14 @@ import (
 )
 
 type Project struct {
-	ID            int
-	CreatorID     int
-	Description   string
-	TaskConfig    string
-	TargetOverlap int
-	TasksPerUser  int
-	CreatedAt     time.Time
+	ID                 int
+	CreatorID          int
+	Description        string
+	TaskConfig         string
+	TargetOverlap      int
+	TasksPerUser       int
+	AnnotatorTimeLimit time.Duration
+	CreatedAt          time.Time
 }
 
 type ProjectAnnotator struct {

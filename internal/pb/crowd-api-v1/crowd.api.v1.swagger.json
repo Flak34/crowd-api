@@ -39,7 +39,7 @@
       }
     },
     "/api/v1/tasks/{projectId}/resolve_by_project": {
-      "get": {
+      "post": {
         "summary": "Get tasks by project id. This method reserves tasks for the user.",
         "operationId": "CrowdAPIV1_ResolveTasksByProject",
         "responses": {

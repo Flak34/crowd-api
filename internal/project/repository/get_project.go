@@ -19,10 +19,10 @@ func (r *Repository) GetProject(ctx context.Context, db entrypoint.Database, pro
 		    task_config, 
 		    target_overlap, 
 		    tasks_per_user, 
-		    created_at 
+		    created_at,
+		    annotator_time_limit
 		FROM project
-		WHERE id = $1
-	`
+		WHERE id = $1`
 	var project ProjectTable
 	err := pgxscan.Get(ctx, db, &project, query, projectID)
 	if err != nil {

@@ -11,6 +11,5 @@ type Task struct {
 	ActiveAnnotatorsIDs []int
 	InputData           string
 	OutputData          string
-	MaxAnnotationTime   time.Duration
 	CreatedAt           time.Time
 }

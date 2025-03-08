@@ -27,9 +27,9 @@ func (r *Repository) InsertProjectAnnotator(
 		INSERT INTO project_annotator (project_id, annotator_id, task_ids)
 		VALUES 
 		($1, $2, $3)`
-	rows, err := db.Query(ctx, query, dto.ProjectID, dto.AnnotatorID, dto.TaskIDs)
+	rows, _ := db.Query(ctx, query, dto.ProjectID, dto.AnnotatorID, dto.TaskIDs)
 	rows.Close()
-	err = rows.Err()
+	err := rows.Err()
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" && pgErr.ConstraintName == ProjectAnnotatorPkeyName {
