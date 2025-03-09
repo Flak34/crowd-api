@@ -1,20 +1,20 @@
 package task_repository
 
 import (
+	"database/sql"
 	model "github.com/Flak34/crowd-api/internal/task/model"
 	"time"
 )
 
 type TaskTable struct {
-	ID                  int           `db:"id"`
-	ProjectID           int           `db:"project_id"`
-	TargetOverlap       int           `db:"target_overlap"`
-	CurrentOverlap      int           `db:"current_overlap"`
-	ActiveAnnotatorsIDs []int         `db:"active_annotators_ids"`
-	InputData           string        `db:"input_data"`
-	OutputData          *string       `db:"output_data"`
-	MaxAnnotationTime   time.Duration `db:"max_annotation_time"`
-	CreatedAt           time.Time     `db:"created_at"`
+	ID                  int            `db:"id"`
+	ProjectID           int            `db:"project_id"`
+	TargetOverlap       int            `db:"target_overlap"`
+	CurrentOverlap      int            `db:"current_overlap"`
+	ActiveAnnotatorsIDs []int          `db:"active_annotators_ids"`
+	InputData           string         `db:"input_data"`
+	OutputData          sql.NullString `db:"output_data"`
+	CreatedAt           time.Time      `db:"created_at"`
 }
 
 func mapTaskTableToModel(task *TaskTable) model.Task {
@@ -28,11 +28,10 @@ func mapTaskTableToModel(task *TaskTable) model.Task {
 		CurrentOverlap:      task.CurrentOverlap,
 		ActiveAnnotatorsIDs: task.ActiveAnnotatorsIDs,
 		InputData:           task.InputData,
-		MaxAnnotationTime:   task.MaxAnnotationTime,
 		CreatedAt:           task.CreatedAt,
 	}
-	if task.OutputData != nil {
-		taskModel.OutputData = *task.OutputData
+	if task.OutputData.Valid {
+		taskModel.OutputData = task.OutputData.String
 	}
 	return taskModel
 }

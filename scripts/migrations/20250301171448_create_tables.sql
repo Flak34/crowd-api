@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS task (
     active_annotators_ids INTEGER[],
     input_data JSONB NOT NULL,
     output_data JSONB,
-    max_annotation_time INTERVAL NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
     annotated_at TIMESTAMPTZ,
     deleted_at TIMESTAMPTZ
@@ -22,6 +21,7 @@ CREATE TABLE IF NOT EXISTS project (
     task_config JSONB NOT NULL,
     target_overlap INTEGER NOT NULL,
     tasks_per_user INTEGER NOT NULL,
+    annotator_time_limit INTERVAL NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc')
 );
 
@@ -29,8 +29,6 @@ CREATE TABLE IF NOT EXISTS task_annotation (
     task_id INTEGER NOT NULL,
     annotator_id TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
-    deadline TIMESTAMPTZ,
-    finished_at TIMESTAMPTZ,
     output_data JSONB,
     PRIMARY KEY (task_id, annotator_id)
 );
@@ -38,7 +36,7 @@ CREATE TABLE IF NOT EXISTS task_annotation (
 CREATE TABLE IF NOT EXISTS project_annotator (
   project_id INTEGER NOT NULL,
   annotator_id INTEGER NOT NULL,
-  task_ids INTEGER[] NOT NULL ,
+  task_ids INTEGER[] NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
   PRIMARY KEY (project_id, annotator_id)
 );

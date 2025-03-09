@@ -26,14 +26,14 @@ func New(pool connectionPool) Entrypoint {
 
 type Entrypoint interface {
 	GetDB() Database
-	TxWrapper(ctx context.Context, fn func(ctx context.Context, tx Database) error) (err error)
+	TxWrapper(ctx context.Context, fn func(ctx context.Context, tx pgx.Tx) error) (err error)
 }
 
 func (e *entrypoint) GetDB() Database {
 	return e.pool
 }
 
-func (e *entrypoint) TxWrapper(ctx context.Context, fn func(ctx context.Context, tx Database) error) (err error) {
+func (e *entrypoint) TxWrapper(ctx context.Context, fn func(ctx context.Context, tx pgx.Tx) error) (err error) {
 	tx, err := e.pool.Begin(ctx)
 	if err != nil {
 		return errors.Wrap(err, "begin transaction")
