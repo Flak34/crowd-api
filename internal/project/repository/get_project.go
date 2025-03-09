@@ -15,7 +15,9 @@ func (r *Repository) GetProject(ctx context.Context, db entrypoint.Database, pro
 		SELECT 
 		    id, 
 		    creator_id,
-		    description, 
+		    description,
+		    name,
+		    instruction,
 		    task_config, 
 		    target_overlap, 
 		    tasks_per_user, 
