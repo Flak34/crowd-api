@@ -12,16 +12,10 @@ const (
 	ProjectAnnotatorPkeyName = "project_annotator_pkey"
 )
 
-type InsertProjectAnnotatorDTO struct {
-	ProjectID   int
-	AnnotatorID int
-	TaskIDs     []int
-}
-
-func (r *Repository) InsertProjectAnnotator(
+func (r *Repository) CreateProjectAnnotator(
 	ctx context.Context,
 	db entrypoint.Database,
-	dto InsertProjectAnnotatorDTO,
+	dto CreateProjectAnnotatorDTO,
 ) error {
 	var query = `
 		INSERT INTO project_annotator (project_id, annotator_id, task_ids)

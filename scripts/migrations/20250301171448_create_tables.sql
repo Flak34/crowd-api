@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS project (
     id SERIAL PRIMARY KEY,
     creator_id INTEGER NOT NULL,
     description TEXT NOT NULL,
+    name TEXT NOT NULL,
+    instruction TEXT NOT NULL,
     task_config JSONB NOT NULL,
     target_overlap INTEGER NOT NULL,
     tasks_per_user INTEGER NOT NULL,
