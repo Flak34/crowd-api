@@ -30,15 +30,17 @@ func mapProjectTableToModel(projectTable ProjectTable) model.Project {
 }
 
 type ProjectAnnotatorTable struct {
-	ProjectID   int   `db:"project_id"`
-	AnnotatorID int   `db:"annotator_id"`
-	TaskIDs     []int `db:"task_ids"`
+	ProjectID   int       `db:"project_id"`
+	AnnotatorID int       `db:"annotator_id"`
+	CreatedAt   time.Time `db:"created_at"`
+	TaskIDs     []int     `db:"task_ids"`
 }
 
 func mapProjectAnnotatorToModel(projectAnnotator ProjectAnnotatorTable) model.ProjectAnnotator {
 	return model.ProjectAnnotator{
 		ProjectID:   projectAnnotator.ProjectID,
 		AnnotatorID: projectAnnotator.AnnotatorID,
+		CreatedAt:   projectAnnotator.CreatedAt,
 		TaskIDs:     projectAnnotator.TaskIDs,
 	}
 }

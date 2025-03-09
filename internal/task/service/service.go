@@ -14,17 +14,19 @@ import (
 
 type TaskRepo interface {
 	ReserveTasks(ctx context.Context, db entrypoint.Database, dto taskrepo.ReserveTasksDTO) ([]model.Task, error)
-	ListTasks(ctx context.Context, db entrypoint.Database, taskIDs ...int) ([]model.Task, error)
+	ReleaseTasks(ctx context.Context, db entrypoint.Database, userID int, taskIDs ...int) error
+	ListUserProjectTasks(ctx context.Context, db entrypoint.Database, projectID int, userID int) ([]model.Task, error)
 }
 
 type ProjectRepo interface {
 	GetProject(ctx context.Context, db entrypoint.Database, projectID int) (projectmodel.Project, error)
 	InsertProjectAnnotator(ctx context.Context, db entrypoint.Database, dto projectrepo.InsertProjectAnnotatorDTO) error
-	GetProjectAnnotator(ctx context.Context, db entrypoint.Database, dto projectrepo.GetProjectAnnotatorDTO) (projectmodel.ProjectAnnotator, error)
+	GetProjectAnnotator(ctx context.Context, db entrypoint.Database, projectID int, userID int) (projectmodel.ProjectAnnotator, error)
 }
 
 type PgqClient[TTx any] interface {
 	InsertTx(ctx context.Context, tx TTx, args river.JobArgs, opts *river.InsertOpts) (*rivertype.JobInsertResult, error)
+	Insert(ctx context.Context, args river.JobArgs, opts *river.InsertOpts) (*rivertype.JobInsertResult, error)
 }
 
 type Service struct {

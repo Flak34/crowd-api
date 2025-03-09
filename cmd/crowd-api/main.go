@@ -55,12 +55,8 @@ func main() {
 	ep := entrypoint.New(dbpool)
 
 	// pgqueue client initialization
-	pgqClient := setupPgQ(dbpool)
+	pgqClient, pgqWorkers := setupPgQ(dbpool)
 	log.Info().Msg("starting pgq")
-	err = pgqClient.Start(ctx)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to start pgq client")
-	}
 
 	// Initializing repositories
 	taskRepo := task_repository.New()
@@ -68,6 +64,15 @@ func main() {
 
 	// Initializing services
 	taskService := task_service.New(ep, taskRepo, projectRepo, pgqClient)
+
+	// Registering workers
+	river.AddWorker(pgqWorkers, pgqueue.NewAnnotationDeadlineHandler(taskService))
+
+	// Starting pgq client
+	err = pgqClient.Start(ctx)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to start pgq client")
+	}
 
 	//Init riverUI server
 	riverUI := setupRiverUIServer(ctx, pgqClient, dbpool)
@@ -150,9 +155,8 @@ func setupHTTPServer(ctx context.Context) *http.Server {
 	return server
 }
 
-func setupPgQ(dbPool *pgxpool.Pool) *river.Client[pgx.Tx] {
+func setupPgQ(dbPool *pgxpool.Pool) (*river.Client[pgx.Tx], *river.Workers) {
 	pgqWorkers := river.NewWorkers()
-	river.AddWorker(pgqWorkers, &pgqueue.AnnotationDeadlineHandler{})
 	pgqClient, err := river.NewClient(riverpgxv5.New(dbPool), &river.Config{
 		JobTimeout: pgqWorkerTimeout,
 		Queues: map[string]river.QueueConfig{
@@ -163,5 +167,5 @@ func setupPgQ(dbPool *pgxpool.Pool) *river.Client[pgx.Tx] {
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to initialize pgq client")
 	}
-	return pgqClient
+	return pgqClient, pgqWorkers
 }

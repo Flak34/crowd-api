@@ -11,3 +11,7 @@ var ErrUnauthorized = errors.New("unauthorized")
 var ErrForbidden = errors.New("forbidden")
 
 var ErrInternal = errors.New("internal error")
+
+func IsInternal(err error) bool {
+	return errors.Is(err, ErrInternal)
+}

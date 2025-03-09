@@ -20,18 +20,18 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-    logging:
-      driver: "gelf"
-      options:
-        gelf-address: "udp://127.0.0.1:12201"
+#    logging:
+#      driver: "gelf"
+#      options:
+#        gelf-address: "udp://127.0.0.1:12201"
     command: -c config_file=/etc/postgresql.conf
     deploy:
       resources:
         limits:
           cpus: '1'
           memory: 4G
-    depends_on:
-      graylog:
-        condition: "service_started"
+#    depends_on:
+#      graylog:
+#        condition: "service_started"
 volumes:
   crowd-db-data:

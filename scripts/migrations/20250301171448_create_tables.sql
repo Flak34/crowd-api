@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS task_annotation (
 CREATE TABLE IF NOT EXISTS project_annotator (
   project_id INTEGER NOT NULL,
   annotator_id INTEGER NOT NULL,
-  task_ids INTEGER[] NOT NULL ,
+  task_ids INTEGER[] NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
   PRIMARY KEY (project_id, annotator_id)
 );
