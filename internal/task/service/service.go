@@ -20,7 +20,7 @@ type TaskRepo interface {
 
 type ProjectRepo interface {
 	GetProject(ctx context.Context, db entrypoint.Database, projectID int) (projectmodel.Project, error)
-	InsertProjectAnnotator(ctx context.Context, db entrypoint.Database, dto projectrepo.InsertProjectAnnotatorDTO) error
+	CreateProjectAnnotator(ctx context.Context, db entrypoint.Database, dto projectrepo.CreateProjectAnnotatorDTO) error
 	GetProjectAnnotator(ctx context.Context, db entrypoint.Database, projectID int, userID int) (projectmodel.ProjectAnnotator, error)
 }
 

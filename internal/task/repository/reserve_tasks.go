@@ -7,12 +7,6 @@ import (
 	"github.com/georgysavva/scany/v2/pgxscan"
 )
 
-type ReserveTasksDTO struct {
-	UserID    int
-	ProjectID int
-	Limit     int
-}
-
 func (r *Repository) ReserveTasks(
 	ctx context.Context,
 	db entrypoint.Database,
