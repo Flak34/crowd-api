@@ -3,7 +3,7 @@ package crowd.api.v1;
 option go_package = "github.com/Flak34/crowd-api;crowd_api_v1";
 
 import "google/api/annotations.proto";
-import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 
 service CrowdAPIV1 {
   rpc Ping(PingRequest) returns (PingResponse) {
@@ -12,15 +12,23 @@ service CrowdAPIV1 {
     };
   }
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Tasks
-
-  // Resolve user tasks by project id. This method reserves tasks for the user or returns already reserved ones.
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Get tasks by project id. This method reserves tasks for the user.
   rpc ResolveTasksByProject(ResolveTasksByProjectRequest) returns (ResolveTasksByProjectResponse) {
     option (google.api.http) = {
       post: "/api/v1/tasks/{project_id}/resolve_by_project"
     };
   }
+
+  // Projects
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/projects"
+    };
+  }
+
 }
 
 message PingRequest {}
@@ -39,5 +47,19 @@ message ResolveTasksByProjectResponse {
 message UserTask {
   int32 id = 1;
   string input_data = 2;
-  google.protobuf.Timestamp deadline = 3;
+}
+
+message CreateProjectRequest {
+  int32 creator_id = 1;
+  string name = 2;
+  string description = 3;
+  string instruction = 4;
+  string task_config = 5;
+  int32 target_overlap = 6;
+  int32 tasks_per_user = 7;
+  google.protobuf.Duration annotator_time_limit = 8;
+}
+
+message CreateProjectResponse {
+  int32 id = 1;
 }

@@ -7,6 +7,7 @@ import (
 	crowd_api_v1 "github.com/Flak34/crowd-api/internal/pb/crowd-api-v1"
 	"github.com/Flak34/crowd-api/internal/pgqueue"
 	project_repository "github.com/Flak34/crowd-api/internal/project/repository"
+	project_service "github.com/Flak34/crowd-api/internal/project/service"
 	task_repository "github.com/Flak34/crowd-api/internal/task/repository"
 	task_service "github.com/Flak34/crowd-api/internal/task/service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -64,6 +65,7 @@ func main() {
 
 	// Initializing services
 	taskService := task_service.New(ep, taskRepo, projectRepo, pgqClient)
+	projectService := project_service.New(ep, projectRepo)
 
 	// Registering workers
 	river.AddWorker(pgqWorkers, pgqueue.NewAnnotationDeadlineHandler(taskService))
@@ -84,7 +86,7 @@ func main() {
 	}()
 
 	// Setup and start gRPC server
-	grpcServer, listener := setupGRPCServer(taskService)
+	grpcServer, listener := setupGRPCServer(taskService, projectService)
 	go func() {
 		log.Info().Msg("starting gRPC server")
 		if err = grpcServer.Serve(listener); err != nil {
@@ -108,13 +110,13 @@ func main() {
 	log.Warn().Stringer("signal", sig).Msg("Gracefully shutting down")
 }
 
-func setupGRPCServer(taskService *task_service.Service) (*grpc.Server, net.Listener) {
+func setupGRPCServer(taskSvc *task_service.Service, projectSvc *project_service.Service) (*grpc.Server, net.Listener) {
 	server := grpc.NewServer()
 	listener, err := net.Listen("tcp", grpcServerAddress)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to start net listener")
 	}
-	crowdAPIV1Service := crowdapiv1.NewCrowdAPIV1(taskService)
+	crowdAPIV1Service := crowdapiv1.NewCrowdAPIV1(taskSvc, projectSvc)
 	crowd_api_v1.RegisterCrowdAPIV1Server(server, crowdAPIV1Service)
 	reflection.Register(server)
 	return server, listener

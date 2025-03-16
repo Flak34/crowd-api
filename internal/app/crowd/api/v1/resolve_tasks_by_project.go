@@ -23,7 +23,7 @@ func (i *Implementation) ResolveTasksByProject(
 	}
 	return &crowd_api_v1.ResolveTasksByProjectResponse{
 		Tasks: lo.Map(res, func(task model.Task, _ int) *crowd_api_v1.UserTask {
-			return mapTaskToProto(task)
+			return mapTaskModelToProto(task)
 		}),
 	}, nil
 }

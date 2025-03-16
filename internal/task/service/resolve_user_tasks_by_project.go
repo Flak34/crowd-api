@@ -39,7 +39,7 @@ func (s *Service) ResolveUserTasksByProject(ctx context.Context, projectID int, 
 		if len(reservedTasks) == 0 {
 			return nil
 		}
-		err = s.projectRepo.InsertProjectAnnotator(ctx, tx, projectrepo.InsertProjectAnnotatorDTO{
+		err = s.projectRepo.CreateProjectAnnotator(ctx, tx, projectrepo.CreateProjectAnnotatorDTO{
 			ProjectID:   projectID,
 			AnnotatorID: userID,
 			TaskIDs: lo.Map(reservedTasks, func(task model.Task, _ int) int {
