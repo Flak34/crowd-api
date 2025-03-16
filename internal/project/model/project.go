@@ -1,6 +1,7 @@
 package project_model
 
 import (
+	annotationmodel "github.com/Flak34/crowd-api/internal/annotation/model"
 	"github.com/pkg/errors"
 	"time"
 )
@@ -36,6 +37,10 @@ type OutputData struct {
 	Name            string
 	IsRequired      bool
 	WithAggregation bool
+}
+
+func (p Project) ValidateAnnotation(annotation annotationmodel.Annotation) error {
+	return nil
 }
 
 func (c Config) Validate() error {

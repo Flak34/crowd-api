@@ -39,7 +39,7 @@ func (s *Service) ReleaseUserProjectTasks(ctx context.Context, projectID int, us
 		return err
 	}
 
-	err = s.taskRepo.ReleaseTasks(ctx, db, userID, projectAnnotator.TaskIDs...)
+	_, err = s.taskRepo.ReleaseTasks(ctx, db, userID, projectAnnotator.TaskIDs...)
 	if err != nil {
 		return errors.Wrapf(usecase_errors.ErrInternal, "release user tasks: %s", err.Error())
 	}
