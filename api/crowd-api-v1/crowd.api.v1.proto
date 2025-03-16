@@ -29,6 +29,11 @@ service CrowdAPIV1 {
     };
   }
 
+  // Annotations
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  rpc CreateAnnotations(CreateAnnotationsRequest) returns (CreateAnnotationsResponse) {
+
+  }
 }
 
 message PingRequest {}
@@ -62,4 +67,12 @@ message CreateProjectRequest {
 
 message CreateProjectResponse {
   int32 id = 1;
+}
+
+message CreateAnnotationsRequest {
+
+}
+
+message CreateAnnotationsResponse {
+
 }
