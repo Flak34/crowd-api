@@ -14,7 +14,7 @@ import (
 
 type TaskRepo interface {
 	ReserveTasks(ctx context.Context, db entrypoint.Database, dto taskrepo.ReserveTasksDTO) ([]model.Task, error)
-	ReleaseTasks(ctx context.Context, db entrypoint.Database, userID int, taskIDs ...int) error
+	ReleaseTasks(ctx context.Context, db entrypoint.Database, userID int, taskIDs ...int) ([]int, error)
 	ListUserProjectTasks(ctx context.Context, db entrypoint.Database, projectID int, userID int) ([]model.Task, error)
 }
 
