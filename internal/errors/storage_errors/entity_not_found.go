@@ -11,6 +11,7 @@ const (
 	EntityProject          EntityName = "project"
 	EntityProjectAnnotator EntityName = "project_annotator"
 	EntityTask             EntityName = "task"
+	EntityUser             EntityName = "user"
 )
 
 type ErrEntityNotFound struct {

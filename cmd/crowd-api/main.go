@@ -2,14 +2,18 @@ package main
 
 import (
 	"context"
+	authv1 "github.com/Flak34/crowd-api/internal/app/auth/v1"
 	crowdapiv1 "github.com/Flak34/crowd-api/internal/app/crowd/api/v1"
 	"github.com/Flak34/crowd-api/internal/entrypoint"
+	auth_v1 "github.com/Flak34/crowd-api/internal/pb/auth"
 	crowd_api_v1 "github.com/Flak34/crowd-api/internal/pb/crowd-api-v1"
 	"github.com/Flak34/crowd-api/internal/pgqueue"
 	project_repository "github.com/Flak34/crowd-api/internal/project/repository"
 	project_service "github.com/Flak34/crowd-api/internal/project/service"
 	task_repository "github.com/Flak34/crowd-api/internal/task/repository"
 	task_service "github.com/Flak34/crowd-api/internal/task/service"
+	user_repository "github.com/Flak34/crowd-api/internal/user/repository"
+	user_service "github.com/Flak34/crowd-api/internal/user/service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -62,10 +66,12 @@ func main() {
 	// Initializing repositories
 	taskRepo := task_repository.New()
 	projectRepo := project_repository.New()
+	userRepo := user_repository.New()
 
 	// Initializing services
 	taskService := task_service.New(ep, taskRepo, projectRepo, pgqClient)
 	projectService := project_service.New(ep, projectRepo)
+	userService := user_service.New(ep, userRepo)
 
 	// Registering workers
 	river.AddWorker(pgqWorkers, pgqueue.NewAnnotationDeadlineHandler(taskService))
@@ -86,7 +92,7 @@ func main() {
 	}()
 
 	// Setup and start gRPC server
-	grpcServer, listener := setupGRPCServer(taskService, projectService)
+	grpcServer, listener := setupGRPCServer(taskService, projectService, userService)
 	go func() {
 		log.Info().Msg("starting gRPC server")
 		if err = grpcServer.Serve(listener); err != nil {
@@ -110,14 +116,20 @@ func main() {
 	log.Warn().Stringer("signal", sig).Msg("Gracefully shutting down")
 }
 
-func setupGRPCServer(taskSvc *task_service.Service, projectSvc *project_service.Service) (*grpc.Server, net.Listener) {
+func setupGRPCServer(
+	taskSvc *task_service.Service,
+	projectSvc *project_service.Service,
+	userService *user_service.Service,
+) (*grpc.Server, net.Listener) {
 	server := grpc.NewServer()
 	listener, err := net.Listen("tcp", grpcServerAddress)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to start net listener")
 	}
 	crowdAPIV1Service := crowdapiv1.NewCrowdAPIV1(taskSvc, projectSvc)
+	authV1Service := authv1.NewAuthV1(userService)
 	crowd_api_v1.RegisterCrowdAPIV1Server(server, crowdAPIV1Service)
+	auth_v1.RegisterAuthV1Server(server, authV1Service)
 	reflection.Register(server)
 	return server, listener
 }
@@ -148,6 +160,9 @@ func setupHTTPServer(ctx context.Context) *http.Server {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 	if err := crowd_api_v1.RegisterCrowdAPIV1HandlerFromEndpoint(ctx, mux, grpcServerAddress, opts); err != nil {
+		log.Fatal().Err(err).Msg("failed to register http handlers")
+	}
+	if err := auth_v1.RegisterAuthV1HandlerFromEndpoint(ctx, mux, grpcServerAddress, opts); err != nil {
 		log.Fatal().Err(err).Msg("failed to register http handlers")
 	}
 	server := &http.Server{
