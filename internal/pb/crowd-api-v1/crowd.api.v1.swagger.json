@@ -183,6 +183,9 @@
         }
       }
     },
+    "v1CreateAnnotationsResponse": {
+      "type": "object"
+    },
     "v1CreateProjectResponse": {
       "type": "object",
       "properties": {

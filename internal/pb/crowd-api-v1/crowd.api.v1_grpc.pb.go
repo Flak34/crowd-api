@@ -22,6 +22,7 @@ const (
 	CrowdAPIV1_Ping_FullMethodName                  = "/crowd.api.v1.CrowdAPIV1/Ping"
 	CrowdAPIV1_ResolveTasksByProject_FullMethodName = "/crowd.api.v1.CrowdAPIV1/ResolveTasksByProject"
 	CrowdAPIV1_CreateProject_FullMethodName         = "/crowd.api.v1.CrowdAPIV1/CreateProject"
+	CrowdAPIV1_CreateAnnotations_FullMethodName     = "/crowd.api.v1.CrowdAPIV1/CreateAnnotations"
 )
 
 // CrowdAPIV1Client is the client API for CrowdAPIV1 service.
@@ -36,6 +37,9 @@ type CrowdAPIV1Client interface {
 	// Projects
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectResponse, error)
+	// Annotations
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	CreateAnnotations(ctx context.Context, in *CreateAnnotationsRequest, opts ...grpc.CallOption) (*CreateAnnotationsResponse, error)
 }
 
 type crowdAPIV1Client struct {
@@ -73,6 +77,15 @@ func (c *crowdAPIV1Client) CreateProject(ctx context.Context, in *CreateProjectR
 	return out, nil
 }
 
+func (c *crowdAPIV1Client) CreateAnnotations(ctx context.Context, in *CreateAnnotationsRequest, opts ...grpc.CallOption) (*CreateAnnotationsResponse, error) {
+	out := new(CreateAnnotationsResponse)
+	err := c.cc.Invoke(ctx, CrowdAPIV1_CreateAnnotations_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CrowdAPIV1Server is the server API for CrowdAPIV1 service.
 // All implementations must embed UnimplementedCrowdAPIV1Server
 // for forward compatibility
@@ -85,6 +98,9 @@ type CrowdAPIV1Server interface {
 	// Projects
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error)
+	// Annotations
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	CreateAnnotations(context.Context, *CreateAnnotationsRequest) (*CreateAnnotationsResponse, error)
 	mustEmbedUnimplementedCrowdAPIV1Server()
 }
 
@@ -100,6 +116,9 @@ func (UnimplementedCrowdAPIV1Server) ResolveTasksByProject(context.Context, *Res
 }
 func (UnimplementedCrowdAPIV1Server) CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateProject not implemented")
+}
+func (UnimplementedCrowdAPIV1Server) CreateAnnotations(context.Context, *CreateAnnotationsRequest) (*CreateAnnotationsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAnnotations not implemented")
 }
 func (UnimplementedCrowdAPIV1Server) mustEmbedUnimplementedCrowdAPIV1Server() {}
 
@@ -168,6 +187,24 @@ func _CrowdAPIV1_CreateProject_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CrowdAPIV1_CreateAnnotations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAnnotationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CrowdAPIV1Server).CreateAnnotations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CrowdAPIV1_CreateAnnotations_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CrowdAPIV1Server).CreateAnnotations(ctx, req.(*CreateAnnotationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CrowdAPIV1_ServiceDesc is the grpc.ServiceDesc for CrowdAPIV1 service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -186,6 +223,10 @@ var CrowdAPIV1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateProject",
 			Handler:    _CrowdAPIV1_CreateProject_Handler,
+		},
+		{
+			MethodName: "CreateAnnotations",
+			Handler:    _CrowdAPIV1_CreateAnnotations_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
