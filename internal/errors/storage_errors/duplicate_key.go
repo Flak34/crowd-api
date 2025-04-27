@@ -7,6 +7,7 @@ type UniqueConstraintName string
 const (
 	ProjectAnnotatorPkey      UniqueConstraintName = "project_annotator_pkey"
 	TaskAnnotatorUqConstraint UniqueConstraintName = "task_annotation_pkey"
+	PersonEmailUqConstraint   UniqueConstraintName = "person_email_key"
 )
 
 type ErrDuplicateKey struct {

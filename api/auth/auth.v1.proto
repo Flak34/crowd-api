@@ -1,0 +1,39 @@
+syntax = "proto3";
+package auth.v1;
+option go_package = "github.com/Flak34/auth;auth_v1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/duration.proto";
+
+service AuthV1 {
+  rpc Register(RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/auth/v1/register"
+    };
+  }
+
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/auth/v1/login"
+    };
+  }
+}
+
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+  repeated string user_roles = 3;
+}
+
+message RegisterResponse {
+  int32 user_id = 1;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+}

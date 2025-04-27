@@ -36,15 +36,35 @@ CREATE TABLE IF NOT EXISTS task_annotation (
 );
 
 CREATE TABLE IF NOT EXISTS project_annotator (
-  project_id INTEGER NOT NULL,
-  annotator_id INTEGER NOT NULL,
-  task_ids INTEGER[] NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
-  PRIMARY KEY (project_id, annotator_id)
+    project_id INTEGER NOT NULL,
+    annotator_id INTEGER NOT NULL,
+    task_ids INTEGER[] NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+    PRIMARY KEY (project_id, annotator_id)
+);
+
+CREATE TABLE IF NOT EXISTS person (
+    id SERIAL PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    pass_hash TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS role (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+INSERT INTO role(name) VALUES
+                           ('PARTNER'),
+                           ('ANNOTATOR');
+
+CREATE TABLE IF NOT EXISTS person_role (
+    person_id INTEGER NOT NULL,
+    role_id INTEGER NOT NULL,
+    PRIMARY KEY (person_id, role_id)
 );
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS task, project, task_annotation, project_annotator;
+DROP TABLE IF EXISTS task, project, task_annotation, project_annotator, person, role, person_role;
 -- +goose StatementEnd
