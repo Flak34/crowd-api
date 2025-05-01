@@ -58,55 +58,12 @@
         },
         "parameters": [
           {
-            "name": "creatorId",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "name",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "description",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "instruction",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "taskConfig",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "targetOverlap",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "tasksPerUser",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "annotatorTimeLimit",
-            "in": "query",
-            "required": false,
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateProjectRequest"
+            }
           }
         ],
         "tags": [
@@ -141,11 +98,12 @@
             "format": "int32"
           },
           {
-            "name": "userId",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CrowdAPIV1ResolveTasksByProjectBody"
+            }
           }
         ],
         "tags": [
@@ -155,6 +113,15 @@
     }
   },
   "definitions": {
+    "CrowdAPIV1ResolveTasksByProjectBody": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -185,6 +152,38 @@
     },
     "v1CreateAnnotationsResponse": {
       "type": "object"
+    },
+    "v1CreateProjectRequest": {
+      "type": "object",
+      "properties": {
+        "creatorId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "instruction": {
+          "type": "string"
+        },
+        "taskConfig": {
+          "type": "string"
+        },
+        "targetOverlap": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "tasksPerUser": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "annotatorTimeLimit": {
+          "type": "string"
+        }
+      }
     },
     "v1CreateProjectResponse": {
       "type": "object",
