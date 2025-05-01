@@ -19,6 +19,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/riverqueue/river"
 	"github.com/riverqueue/river/riverdriver/riverpgxv5"
+	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"log/slog"
 	"os"
@@ -165,9 +166,18 @@ func setupHTTPServer(ctx context.Context) *http.Server {
 	if err := auth_v1.RegisterAuthV1HandlerFromEndpoint(ctx, mux, grpcServerAddress, opts); err != nil {
 		log.Fatal().Err(err).Msg("failed to register http handlers")
 	}
+	muxWithCors := cors.New(cors.Options{
+		AllowOriginFunc: func(origin string) bool {
+			return true
+		},
+		AllowedMethods:   []string{"GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"ACCEPT", "Authorization", "Content-Type", "X-CSRF-Token", "TEST1"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+	}).Handler(mux)
 	server := &http.Server{
 		Addr:    httpServerAddress,
-		Handler: mux,
+		Handler: muxWithCors,
 	}
 	return server
 }
