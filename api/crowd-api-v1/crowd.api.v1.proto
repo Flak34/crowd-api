@@ -18,6 +18,7 @@ service CrowdAPIV1 {
   rpc ResolveTasksByProject(ResolveTasksByProjectRequest) returns (ResolveTasksByProjectResponse) {
     option (google.api.http) = {
       post: "/api/v1/tasks/{project_id}/resolve_by_project"
+      body: "*"
     };
   }
 
@@ -26,6 +27,7 @@ service CrowdAPIV1 {
   rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse) {
     option (google.api.http) = {
       post: "/api/v1/projects"
+      body: "*"
     };
   }
 
