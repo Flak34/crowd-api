@@ -12,6 +12,7 @@ type ProjectTable struct {
 	Description        string        `db:"description"`
 	Name               string        `db:"name"`
 	Instruction        string        `db:"instruction"`
+	Status             string        `db:"status"`
 	Config             ConfigRow     `db:"task_config"`
 	TargetOverlap      int           `db:"target_overlap"`
 	TasksPerUser       int           `db:"tasks_per_user"`

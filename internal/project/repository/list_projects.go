@@ -3,29 +3,36 @@ package project_repository
 import (
 	"context"
 	"github.com/Flak34/crowd-api/internal/entrypoint"
+	"github.com/Flak34/crowd-api/internal/lib/common"
 	model "github.com/Flak34/crowd-api/internal/project/model"
 	"github.com/georgysavva/scany/v2/pgxscan"
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/huandu/go-sqlbuilder"
 	"github.com/samber/lo"
 )
 
-func (r *Repository) ListProjects(ctx context.Context, db entrypoint.Database, projectIDs ...int) ([]model.Project, error) {
-	var query = `
-		SELECT 
-		    id, 
-		    creator_id,
-		    description,
-		    name,
-		    instruction,
-		    task_config, 
-		    target_overlap, 
-		    tasks_per_user, 
-		    created_at,
-		    annotator_time_limit
-		FROM project
-		WHERE id = ANY($1::INTEGER[])`
+func (r *Repository) ListProjects(ctx context.Context, db entrypoint.Database, opts ...common.SelectOption) ([]model.Project, error) {
+	sb := sqlbuilder.PostgreSQL.NewSelectBuilder()
+	sb.
+		From("project").
+		Select(
+			"project.id",
+			"project.creator_id",
+			"project.description",
+			"project.name",
+			"project.instruction",
+			"project.task_config",
+			"project.target_overlap",
+			"project.tasks_per_user",
+			"project.created_at",
+			"project.annotator_time_limit",
+			"project_status.name AS status").
+		JoinWithOption(sqlbuilder.LeftJoin, "project_status", "project.status_id = project_status.id")
+	for _, opt := range opts {
+		sb = opt(sb)
+	}
+	query, args := sb.Build()
 	var projects []*ProjectTable
-	err := pgxscan.Select(ctx, db, &projects, query, pgtype.FlatArray[int](projectIDs))
+	err := pgxscan.Select(ctx, db, &projects, query, args...)
 	if err != nil {
 		return []model.Project{}, err
 	}

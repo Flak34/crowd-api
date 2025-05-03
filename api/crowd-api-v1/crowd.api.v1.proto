@@ -4,14 +4,9 @@ option go_package = "github.com/Flak34/crowd-api;crowd_api_v1";
 
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
 
 service CrowdAPIV1 {
-  rpc Ping(PingRequest) returns (PingResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/ping"
-    };
-  }
-
   // Tasks
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Get tasks by project id. This method reserves tasks for the user.
@@ -31,16 +26,19 @@ service CrowdAPIV1 {
     };
   }
 
+  rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/projects/list"
+      body: "*"
+    };
+  }
+
   // Annotations
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   rpc CreateAnnotations(CreateAnnotationsRequest) returns (CreateAnnotationsResponse) {
 
   }
 }
-
-message PingRequest {}
-
-message PingResponse {}
 
 message ResolveTasksByProjectRequest {
   int32 project_id = 1;
@@ -49,11 +47,6 @@ message ResolveTasksByProjectRequest {
 
 message ResolveTasksByProjectResponse {
   repeated UserTask tasks = 1;
-}
-
-message UserTask {
-  int32 id = 1;
-  string input_data = 2;
 }
 
 message CreateProjectRequest {
@@ -71,10 +64,58 @@ message CreateProjectResponse {
   int32 id = 1;
 }
 
+message ListProjectsRequest {
+  ProjectFilter filter = 1;
+  Page page = 2;
+  Sort sort = 3;
+
+  message ProjectFilter {
+    int32 creator_id = 1;
+    string status = 2;
+  }
+}
+
+message ListProjectsResponse {
+  repeated Project projects = 1;
+  PageResponse page = 2;
+}
+
 message CreateAnnotationsRequest {
 
 }
 
 message CreateAnnotationsResponse {
 
+}
+
+// MODELS
+message UserTask {
+  int32 id = 1;
+  string input_data = 2;
+}
+
+message Project {
+  int32 id = 1;
+  int32 creator_id = 2;
+  string description = 3;
+  string name = 4;
+  string instruction = 5;
+  int32 target_overlap = 6;
+  int32 tasks_per_user = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Duration annotator_time_limit = 9;
+}
+
+message Sort {
+  string sort_field = 1;
+  bool desc = 2;
+}
+
+message Page {
+  int32 page_num = 1;
+  int32 per_page = 2;
+}
+
+message PageResponse {
+  int32 pages_count = 1;
 }

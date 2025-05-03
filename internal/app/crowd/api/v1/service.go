@@ -2,21 +2,23 @@ package crowdapiv1
 
 import (
 	"context"
-	crowd_api_v1 "github.com/Flak34/crowd-api/internal/pb/crowd-api-v1"
+	crowdapiv1 "github.com/Flak34/crowd-api/internal/pb/crowd-api-v1"
 	projectmodel "github.com/Flak34/crowd-api/internal/project/model"
-	task_model "github.com/Flak34/crowd-api/internal/task/model"
+	projectservice "github.com/Flak34/crowd-api/internal/project/service"
+	taskmodel "github.com/Flak34/crowd-api/internal/task/model"
 )
 
 type TaskService interface {
-	ResolveUserTasksByProject(ctx context.Context, projectID int, userID int) ([]task_model.Task, error)
+	ResolveUserTasksByProject(ctx context.Context, projectID int, userID int) ([]taskmodel.Task, error)
 }
 
 type ProjectService interface {
 	CreateProject(ctx context.Context, project projectmodel.Project) (int, error)
+	ListProjects(ctx context.Context, dto projectservice.ListProjectsDTO) (projects []projectmodel.Project, totalCount int, err error)
 }
 
 type Implementation struct {
-	crowd_api_v1.UnimplementedCrowdAPIV1Server
+	crowdapiv1.UnimplementedCrowdAPIV1Server
 	taskService    TaskService
 	projectService ProjectService
 }
