@@ -12,7 +12,8 @@ type ProjectTable struct {
 	Description        string        `db:"description"`
 	Name               string        `db:"name"`
 	Instruction        string        `db:"instruction"`
-	Status             string        `db:"status"`
+	Status             string        `db:"status_name"`
+	StatusID           int           `db:"status_id"`
 	Config             ConfigRow     `db:"task_config"`
 	TargetOverlap      int           `db:"target_overlap"`
 	TasksPerUser       int           `db:"tasks_per_user"`
@@ -39,33 +40,38 @@ type OutputDataRow struct {
 
 func mapProjectTableToModel(projectTable ProjectTable) model.Project {
 	return model.Project{
-		ID:          projectTable.ID,
-		CreatorID:   projectTable.CreatorID,
-		Description: projectTable.Description,
-		Name:        projectTable.Name,
-		Status:      projectTable.Status,
-		Instruction: projectTable.Instruction,
-		Config: model.Config{
-			InputData: lo.Map(projectTable.Config.InputData,
-				func(data InputDataRow, _ int) model.InputData {
-					return model.InputData{
-						Type: model.DataType(data.Type),
-						Name: data.Name,
-					}
-				}),
-			OutputData: lo.Map(projectTable.Config.OutputData,
-				func(data OutputDataRow, _ int) model.OutputData {
-					return model.OutputData{
-						Type:            model.DataType(data.Type),
-						Name:            data.Name,
-						WithAggregation: data.WithAggregation,
-					}
-				}),
-		},
+		ID:                 projectTable.ID,
+		CreatorID:          projectTable.CreatorID,
+		Description:        projectTable.Description,
+		Name:               projectTable.Name,
+		Status:             projectTable.Status,
+		Instruction:        projectTable.Instruction,
+		Config:             mapConfigRowToProjectConfig(projectTable.Config),
 		TargetOverlap:      projectTable.TargetOverlap,
 		TasksPerUser:       projectTable.TasksPerUser,
 		CreatedAt:          projectTable.CreatedAt,
 		AnnotatorTimeLimit: projectTable.AnnotatorTimeLimit,
+	}
+}
+
+func mapConfigRowToProjectConfig(config ConfigRow) model.Config {
+	return model.Config{
+		InputData: lo.Map(config.InputData,
+			func(data InputDataRow, _ int) model.InputData {
+				return model.InputData{
+					Type: model.DataType(data.Type),
+					Name: data.Name,
+				}
+			}),
+		OutputData: lo.Map(config.OutputData,
+			func(data OutputDataRow, _ int) model.OutputData {
+				return model.OutputData{
+					Type:            model.DataType(data.Type),
+					Name:            data.Name,
+					WithAggregation: data.WithAggregation,
+				}
+			}),
+		Layout: config.SerializedLayout,
 	}
 }
 

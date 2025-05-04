@@ -22,6 +22,7 @@ const (
 	CrowdAPIV1_ResolveTasksByProject_FullMethodName = "/crowd.api.v1.CrowdAPIV1/ResolveTasksByProject"
 	CrowdAPIV1_CreateProject_FullMethodName         = "/crowd.api.v1.CrowdAPIV1/CreateProject"
 	CrowdAPIV1_ListProjects_FullMethodName          = "/crowd.api.v1.CrowdAPIV1/ListProjects"
+	CrowdAPIV1_GetProject_FullMethodName            = "/crowd.api.v1.CrowdAPIV1/GetProject"
 	CrowdAPIV1_CreateAnnotations_FullMethodName     = "/crowd.api.v1.CrowdAPIV1/CreateAnnotations"
 )
 
@@ -37,6 +38,7 @@ type CrowdAPIV1Client interface {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectResponse, error)
 	ListProjects(ctx context.Context, in *ListProjectsRequest, opts ...grpc.CallOption) (*ListProjectsResponse, error)
+	GetProject(ctx context.Context, in *GetProjectRequest, opts ...grpc.CallOption) (*GetProjectResponse, error)
 	// Annotations
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	CreateAnnotations(ctx context.Context, in *CreateAnnotationsRequest, opts ...grpc.CallOption) (*CreateAnnotationsResponse, error)
@@ -77,6 +79,15 @@ func (c *crowdAPIV1Client) ListProjects(ctx context.Context, in *ListProjectsReq
 	return out, nil
 }
 
+func (c *crowdAPIV1Client) GetProject(ctx context.Context, in *GetProjectRequest, opts ...grpc.CallOption) (*GetProjectResponse, error) {
+	out := new(GetProjectResponse)
+	err := c.cc.Invoke(ctx, CrowdAPIV1_GetProject_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *crowdAPIV1Client) CreateAnnotations(ctx context.Context, in *CreateAnnotationsRequest, opts ...grpc.CallOption) (*CreateAnnotationsResponse, error) {
 	out := new(CreateAnnotationsResponse)
 	err := c.cc.Invoke(ctx, CrowdAPIV1_CreateAnnotations_FullMethodName, in, out, opts...)
@@ -98,6 +109,7 @@ type CrowdAPIV1Server interface {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error)
 	ListProjects(context.Context, *ListProjectsRequest) (*ListProjectsResponse, error)
+	GetProject(context.Context, *GetProjectRequest) (*GetProjectResponse, error)
 	// Annotations
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	CreateAnnotations(context.Context, *CreateAnnotationsRequest) (*CreateAnnotationsResponse, error)
@@ -116,6 +128,9 @@ func (UnimplementedCrowdAPIV1Server) CreateProject(context.Context, *CreateProje
 }
 func (UnimplementedCrowdAPIV1Server) ListProjects(context.Context, *ListProjectsRequest) (*ListProjectsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListProjects not implemented")
+}
+func (UnimplementedCrowdAPIV1Server) GetProject(context.Context, *GetProjectRequest) (*GetProjectResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProject not implemented")
 }
 func (UnimplementedCrowdAPIV1Server) CreateAnnotations(context.Context, *CreateAnnotationsRequest) (*CreateAnnotationsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAnnotations not implemented")
@@ -187,6 +202,24 @@ func _CrowdAPIV1_ListProjects_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CrowdAPIV1_GetProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProjectRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CrowdAPIV1Server).GetProject(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CrowdAPIV1_GetProject_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CrowdAPIV1Server).GetProject(ctx, req.(*GetProjectRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CrowdAPIV1_CreateAnnotations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateAnnotationsRequest)
 	if err := dec(in); err != nil {
@@ -223,6 +256,10 @@ var CrowdAPIV1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListProjects",
 			Handler:    _CrowdAPIV1_ListProjects_Handler,
+		},
+		{
+			MethodName: "GetProject",
+			Handler:    _CrowdAPIV1_GetProject_Handler,
 		},
 		{
 			MethodName: "CreateAnnotations",

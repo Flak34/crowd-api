@@ -33,6 +33,12 @@ service CrowdAPIV1 {
     };
   }
 
+  rpc GetProject(GetProjectRequest) returns (GetProjectResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/projects/{id}"
+    };
+  }
+
   // Annotations
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   rpc CreateAnnotations(CreateAnnotationsRequest) returns (CreateAnnotationsResponse) {
@@ -78,6 +84,14 @@ message ListProjectsRequest {
 message ListProjectsResponse {
   repeated Project projects = 1;
   PageResponse page = 2;
+}
+
+message GetProjectRequest {
+  int32 id = 1;
+}
+
+message GetProjectResponse {
+  Project project = 1;
 }
 
 message CreateAnnotationsRequest {

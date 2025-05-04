@@ -3,17 +3,9 @@ package crowdapiv1
 import (
 	desc "github.com/Flak34/crowd-api/internal/pb/crowd-api-v1"
 	projectmodel "github.com/Flak34/crowd-api/internal/project/model"
-	taskmodel "github.com/Flak34/crowd-api/internal/task/model"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
-
-func mapTaskModelToProto(task taskmodel.Task) *desc.UserTask {
-	return &desc.UserTask{
-		Id:        int32(task.ID),
-		InputData: task.InputData,
-	}
-}
 
 func mapProjectModelToProto(project projectmodel.Project) *desc.Project {
 	return &desc.Project{

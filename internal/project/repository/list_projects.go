@@ -25,7 +25,7 @@ func (r *Repository) ListProjects(ctx context.Context, db entrypoint.Database, o
 			"project.tasks_per_user",
 			"project.created_at",
 			"project.annotator_time_limit",
-			"project_status.name AS status").
+			"project_status.name AS status_name").
 		JoinWithOption(sqlbuilder.LeftJoin, "project_status", "project.status_id = project_status.id")
 	for _, opt := range opts {
 		sb = opt(sb)

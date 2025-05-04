@@ -125,6 +125,42 @@ func local_request_CrowdAPIV1_ListProjects_0(ctx context.Context, marshaler runt
 	return msg, metadata, err
 }
 
+func request_CrowdAPIV1_GetProject_0(ctx context.Context, marshaler runtime.Marshaler, client CrowdAPIV1Client, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetProjectRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+	protoReq.Id, err = runtime.Int32(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+	msg, err := client.GetProject(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_CrowdAPIV1_GetProject_0(ctx context.Context, marshaler runtime.Marshaler, server CrowdAPIV1Server, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetProjectRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+	protoReq.Id, err = runtime.Int32(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+	msg, err := server.GetProject(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 func request_CrowdAPIV1_CreateAnnotations_0(ctx context.Context, marshaler runtime.Marshaler, client CrowdAPIV1Client, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq CreateAnnotationsRequest
@@ -214,6 +250,26 @@ func RegisterCrowdAPIV1HandlerServer(ctx context.Context, mux *runtime.ServeMux,
 			return
 		}
 		forward_CrowdAPIV1_ListProjects_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_CrowdAPIV1_GetProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/crowd.api.v1.CrowdAPIV1/GetProject", runtime.WithHTTPPathPattern("/api/v1/projects/{id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CrowdAPIV1_GetProject_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CrowdAPIV1_GetProject_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	mux.Handle(http.MethodPost, pattern_CrowdAPIV1_CreateAnnotations_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -326,6 +382,23 @@ func RegisterCrowdAPIV1HandlerClient(ctx context.Context, mux *runtime.ServeMux,
 		}
 		forward_CrowdAPIV1_ListProjects_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodGet, pattern_CrowdAPIV1_GetProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/crowd.api.v1.CrowdAPIV1/GetProject", runtime.WithHTTPPathPattern("/api/v1/projects/{id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CrowdAPIV1_GetProject_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CrowdAPIV1_GetProject_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	mux.Handle(http.MethodPost, pattern_CrowdAPIV1_CreateAnnotations_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -350,6 +423,7 @@ var (
 	pattern_CrowdAPIV1_ResolveTasksByProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "tasks", "project_id", "resolve_by_project"}, ""))
 	pattern_CrowdAPIV1_CreateProject_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "projects"}, ""))
 	pattern_CrowdAPIV1_ListProjects_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "projects", "list"}, ""))
+	pattern_CrowdAPIV1_GetProject_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "projects", "id"}, ""))
 	pattern_CrowdAPIV1_CreateAnnotations_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"crowd.api.v1.CrowdAPIV1", "CreateAnnotations"}, ""))
 )
 
@@ -357,5 +431,6 @@ var (
 	forward_CrowdAPIV1_ResolveTasksByProject_0 = runtime.ForwardResponseMessage
 	forward_CrowdAPIV1_CreateProject_0         = runtime.ForwardResponseMessage
 	forward_CrowdAPIV1_ListProjects_0          = runtime.ForwardResponseMessage
+	forward_CrowdAPIV1_GetProject_0            = runtime.ForwardResponseMessage
 	forward_CrowdAPIV1_CreateAnnotations_0     = runtime.ForwardResponseMessage
 )

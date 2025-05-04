@@ -81,6 +81,37 @@
         ]
       }
     },
+    "/api/v1/projects/{id}": {
+      "get": {
+        "operationId": "CrowdAPIV1_GetProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetProjectResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "CrowdAPIV1"
+        ]
+      }
+    },
     "/api/v1/tasks/{projectId}/resolve_by_project": {
       "post": {
         "summary": "Tasks\r\n////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\r\nGet tasks by project id. This method reserves tasks for the user.",
@@ -213,6 +244,14 @@
         "id": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "v1GetProjectResponse": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "$ref": "#/definitions/v1Project"
         }
       }
     },

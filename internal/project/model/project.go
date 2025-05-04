@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+const (
+	ProjectCreatedStatusName = "created"
+	ProjectActiveStatusName  = "active"
+)
+
 type Project struct {
 	ID                 int
 	CreatorID          int
