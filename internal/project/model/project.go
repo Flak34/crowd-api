@@ -11,6 +11,7 @@ type Project struct {
 	CreatorID          int
 	Description        string
 	Name               string
+	Status             string
 	Instruction        string
 	Config             Config
 	TargetOverlap      int
@@ -22,20 +23,19 @@ type Project struct {
 type Config struct {
 	InputData  []InputData
 	OutputData []OutputData
+	Layout     string
 }
 
 type DataType string
 
 type InputData struct {
-	Type       DataType
-	Name       string
-	IsRequired bool
+	Type DataType
+	Name string
 }
 
 type OutputData struct {
 	Type            DataType
 	Name            string
-	IsRequired      bool
 	WithAggregation bool
 }
 

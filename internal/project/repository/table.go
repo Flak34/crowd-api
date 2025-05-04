@@ -21,20 +21,19 @@ type ProjectTable struct {
 }
 
 type ConfigRow struct {
-	InputData  []InputDataRow  `json:"input_data"`
-	OutputData []OutputDataRow `json:"output_data"`
+	InputData        []InputDataRow  `json:"input_data"`
+	OutputData       []OutputDataRow `json:"output_data"`
+	SerializedLayout string          `json:"serialized_layout"`
 }
 
 type InputDataRow struct {
-	Type       string `json:"type"`
-	Name       string `json:"name"`
-	IsRequired bool   `json:"is_required"`
+	Type string `json:"type"`
+	Name string `json:"name"`
 }
 
 type OutputDataRow struct {
 	Type            string `json:"type"`
 	Name            string `json:"name"`
-	IsRequired      bool   `json:"is_required"`
 	WithAggregation bool   `json:"with_aggregation"`
 }
 
@@ -44,14 +43,14 @@ func mapProjectTableToModel(projectTable ProjectTable) model.Project {
 		CreatorID:   projectTable.CreatorID,
 		Description: projectTable.Description,
 		Name:        projectTable.Name,
+		Status:      projectTable.Status,
 		Instruction: projectTable.Instruction,
 		Config: model.Config{
 			InputData: lo.Map(projectTable.Config.InputData,
 				func(data InputDataRow, _ int) model.InputData {
 					return model.InputData{
-						Type:       model.DataType(data.Type),
-						Name:       data.Name,
-						IsRequired: data.IsRequired,
+						Type: model.DataType(data.Type),
+						Name: data.Name,
 					}
 				}),
 			OutputData: lo.Map(projectTable.Config.OutputData,
@@ -59,7 +58,6 @@ func mapProjectTableToModel(projectTable ProjectTable) model.Project {
 					return model.OutputData{
 						Type:            model.DataType(data.Type),
 						Name:            data.Name,
-						IsRequired:      data.IsRequired,
 						WithAggregation: data.WithAggregation,
 					}
 				}),
@@ -71,36 +69,24 @@ func mapProjectTableToModel(projectTable ProjectTable) model.Project {
 	}
 }
 
-func mapProjectModelToTable(project model.Project) ProjectTable {
-	return ProjectTable{
-		ID:          project.ID,
-		CreatorID:   project.CreatorID,
-		Description: project.Description,
-		Name:        project.Name,
-		Instruction: project.Instruction,
-		Config: ConfigRow{
-			InputData: lo.Map(project.Config.InputData,
-				func(data model.InputData, _ int) InputDataRow {
-					return InputDataRow{
-						Type:       string(data.Type),
-						Name:       data.Name,
-						IsRequired: data.IsRequired,
-					}
-				}),
-			OutputData: lo.Map(project.Config.OutputData,
-				func(data model.OutputData, _ int) OutputDataRow {
-					return OutputDataRow{
-						Type:            string(data.Type),
-						Name:            data.Name,
-						IsRequired:      data.IsRequired,
-						WithAggregation: data.WithAggregation,
-					}
-				}),
-		},
-		TargetOverlap:      project.TargetOverlap,
-		TasksPerUser:       project.TasksPerUser,
-		CreatedAt:          project.CreatedAt,
-		AnnotatorTimeLimit: project.AnnotatorTimeLimit,
+func mapProjectConfigToConfigRow(config model.Config) ConfigRow {
+	return ConfigRow{
+		InputData: lo.Map(config.InputData,
+			func(data model.InputData, _ int) InputDataRow {
+				return InputDataRow{
+					Type: string(data.Type),
+					Name: data.Name,
+				}
+			}),
+		OutputData: lo.Map(config.OutputData,
+			func(data model.OutputData, _ int) OutputDataRow {
+				return OutputDataRow{
+					Type:            string(data.Type),
+					Name:            data.Name,
+					WithAggregation: data.WithAggregation,
+				}
+			}),
+		SerializedLayout: config.Layout,
 	}
 }
 

@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS project_status (
 );
 
 INSERT INTO project_status(name) VALUES
+                                    ('created'),
                                     ('active'),
                                     ('finished');
 

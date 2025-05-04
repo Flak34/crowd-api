@@ -26,5 +26,6 @@ func mapProjectModelToProto(project projectmodel.Project) *desc.Project {
 		TasksPerUser:       int32(project.TasksPerUser),
 		CreatedAt:          timestamppb.New(project.CreatedAt),
 		AnnotatorTimeLimit: durationpb.New(project.AnnotatorTimeLimit),
+		Status:             project.Status,
 	}
 }

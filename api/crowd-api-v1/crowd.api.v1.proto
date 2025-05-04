@@ -104,6 +104,7 @@ message Project {
   int32 tasks_per_user = 7;
   google.protobuf.Timestamp created_at = 8;
   google.protobuf.Duration annotator_time_limit = 9;
+  string status = 10;
 }
 
 message Sort {

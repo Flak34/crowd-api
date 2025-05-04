@@ -7,12 +7,17 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	initialStatus = "created"
+)
+
 func (s *Service) CreateProject(ctx context.Context, project model.Project) (int, error) {
 	db := s.ep.GetDB()
 	err := validateProject(project)
 	if err != nil {
 		return 0, err
 	}
+	project.Status = initialStatus
 	id, err := s.projectRepo.CreateProject(ctx, db, project)
 	if err != nil {
 		return 0, errors.Wrapf(uscerrors.ErrInternal, "create project: %v", err)
