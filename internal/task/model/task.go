@@ -12,6 +12,7 @@ type Task struct {
 	InputData           []InputData
 	OutputData          []OutputData
 	CreatedAt           time.Time
+	AnnotationLimit     time.Time
 }
 
 type InputData struct {

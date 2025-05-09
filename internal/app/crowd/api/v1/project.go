@@ -23,17 +23,17 @@ type ProjectDTO struct {
 }
 
 type ProjectConfigDTO struct {
-	InputData        []InputDataDTO  `json:"inputData"`
-	OutputData       []OutputDataDTO `json:"outputData"`
-	SerializedLayout string          `json:"serializedLayout"`
+	InputData        []ProjectInputDataDTO  `json:"inputData"`
+	OutputData       []ProjectOutputDataDTO `json:"outputData"`
+	SerializedLayout string                 `json:"serializedLayout"`
 }
 
-type InputDataDTO struct {
+type ProjectInputDataDTO struct {
 	Type string `json:"type"`
 	Name string `json:"name"`
 }
 
-type OutputDataDTO struct {
+type ProjectOutputDataDTO struct {
 	Type            string `json:"type"`
 	Name            string `json:"name"`
 	WithAggregation bool   `json:"withAggregation"`
@@ -61,6 +61,25 @@ func protoToProjectDTO(req *crowdapiv1.CreateProjectRequest) (ProjectDTO, error)
 	}, nil
 }
 
+func modelToProjectConfigDTO(config model.Config) ProjectConfigDTO {
+	return ProjectConfigDTO{
+		InputData: lo.Map(config.InputData, func(data model.InputData, _ int) ProjectInputDataDTO {
+			return ProjectInputDataDTO{
+				Type: string(data.Type),
+				Name: data.Name,
+			}
+		}),
+		OutputData: lo.Map(config.OutputData, func(data model.OutputData, _ int) ProjectOutputDataDTO {
+			return ProjectOutputDataDTO{
+				Type:            string(data.Type),
+				Name:            data.Name,
+				WithAggregation: data.WithAggregation,
+			}
+		}),
+		SerializedLayout: config.Layout,
+	}
+}
+
 func validateProjectReq(req *crowdapiv1.CreateProjectRequest) error {
 	if req == nil {
 		return errors.New("request must not be nil")
@@ -86,14 +105,14 @@ func projectDTOToModel(dto ProjectDTO) model.Project {
 		Instruction: dto.Instruction,
 		Config: model.Config{
 			InputData: lo.Map(dto.Config.InputData,
-				func(data InputDataDTO, _ int) model.InputData {
+				func(data ProjectInputDataDTO, _ int) model.InputData {
 					return model.InputData{
 						Type: model.DataType(data.Type),
 						Name: data.Name,
 					}
 				}),
 			OutputData: lo.Map(dto.Config.OutputData,
-				func(data OutputDataDTO, _ int) model.OutputData {
+				func(data ProjectOutputDataDTO, _ int) model.OutputData {
 					return model.OutputData{
 						Type:            model.DataType(data.Type),
 						Name:            data.Name,

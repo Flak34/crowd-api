@@ -39,18 +39,9 @@ func request_CrowdAPIV1_ResolveTasksByProject_0(ctx context.Context, marshaler r
 	var (
 		protoReq ResolveTasksByProjectRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	val, ok := pathParams["project_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "project_id")
-	}
-	protoReq.ProjectId, err = runtime.Int32(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "project_id", err)
 	}
 	msg, err := client.ResolveTasksByProject(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -60,18 +51,9 @@ func local_request_CrowdAPIV1_ResolveTasksByProject_0(ctx context.Context, marsh
 	var (
 		protoReq ResolveTasksByProjectRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	val, ok := pathParams["project_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "project_id")
-	}
-	protoReq.ProjectId, err = runtime.Int32(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "project_id", err)
 	}
 	msg, err := server.ResolveTasksByProject(ctx, &protoReq)
 	return msg, metadata, err
@@ -197,7 +179,7 @@ func RegisterCrowdAPIV1HandlerServer(ctx context.Context, mux *runtime.ServeMux,
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/crowd.api.v1.CrowdAPIV1/ResolveTasksByProject", runtime.WithHTTPPathPattern("/api/v1/tasks/{project_id}/resolve_by_project"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/crowd.api.v1.CrowdAPIV1/ResolveTasksByProject", runtime.WithHTTPPathPattern("/api/v1/tasks/resolve_by_project"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -335,7 +317,7 @@ func RegisterCrowdAPIV1HandlerClient(ctx context.Context, mux *runtime.ServeMux,
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/crowd.api.v1.CrowdAPIV1/ResolveTasksByProject", runtime.WithHTTPPathPattern("/api/v1/tasks/{project_id}/resolve_by_project"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/crowd.api.v1.CrowdAPIV1/ResolveTasksByProject", runtime.WithHTTPPathPattern("/api/v1/tasks/resolve_by_project"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -420,7 +402,7 @@ func RegisterCrowdAPIV1HandlerClient(ctx context.Context, mux *runtime.ServeMux,
 }
 
 var (
-	pattern_CrowdAPIV1_ResolveTasksByProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "tasks", "project_id", "resolve_by_project"}, ""))
+	pattern_CrowdAPIV1_ResolveTasksByProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "tasks", "resolve_by_project"}, ""))
 	pattern_CrowdAPIV1_CreateProject_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "projects"}, ""))
 	pattern_CrowdAPIV1_ListProjects_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "projects", "list"}, ""))
 	pattern_CrowdAPIV1_GetProject_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "projects", "id"}, ""))

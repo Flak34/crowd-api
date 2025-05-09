@@ -112,7 +112,7 @@
         ]
       }
     },
-    "/api/v1/tasks/{projectId}/resolve_by_project": {
+    "/api/v1/tasks/resolve_by_project": {
       "post": {
         "summary": "Tasks\r\n////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\r\nGet tasks by project id. This method reserves tasks for the user.",
         "operationId": "CrowdAPIV1_ResolveTasksByProject",
@@ -132,18 +132,11 @@
         },
         "parameters": [
           {
-            "name": "projectId",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/CrowdAPIV1ResolveTasksByProjectBody"
+              "$ref": "#/definitions/v1ResolveTasksByProjectRequest"
             }
           }
         ],
@@ -154,15 +147,6 @@
     }
   },
   "definitions": {
-    "CrowdAPIV1ResolveTasksByProjectBody": {
-      "type": "object",
-      "properties": {
-        "userId": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
     "ListProjectsRequestProjectFilter": {
       "type": "object",
       "properties": {
@@ -200,6 +184,37 @@
             "type": "object",
             "$ref": "#/definitions/protobufAny"
           }
+        }
+      }
+    },
+    "v1AnnotatorTask": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "projectId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "targetOverlap": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "currentOverlap": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "inputData": {
+          "type": "string"
+        },
+        "outputData": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -343,6 +358,23 @@
         },
         "status": {
           "type": "string"
+        },
+        "taskConfig": {
+          "type": "string"
+        }
+      },
+      "title": "MODELS"
+    },
+    "v1ResolveTasksByProjectRequest": {
+      "type": "object",
+      "properties": {
+        "projectId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "userId": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -353,8 +385,12 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1UserTask"
+            "$ref": "#/definitions/v1AnnotatorTask"
           }
+        },
+        "annotationDeadline": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -368,19 +404,6 @@
           "type": "boolean"
         }
       }
-    },
-    "v1UserTask": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "inputData": {
-          "type": "string"
-        }
-      },
-      "title": "MODELS"
     }
   }
 }

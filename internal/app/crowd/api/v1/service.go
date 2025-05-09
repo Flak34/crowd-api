@@ -5,12 +5,12 @@ import (
 	crowdapiv1 "github.com/Flak34/crowd-api/internal/pb/crowd-api-v1"
 	projectmodel "github.com/Flak34/crowd-api/internal/project/model"
 	projectservice "github.com/Flak34/crowd-api/internal/project/service"
-	taskmodel "github.com/Flak34/crowd-api/internal/task/model"
+	task_service "github.com/Flak34/crowd-api/internal/task/service"
 	"io"
 )
 
 type taskService interface {
-	ResolveUserTasksByProject(ctx context.Context, projectID int, userID int) ([]taskmodel.Task, error)
+	ResolveUserTasksByProject(ctx context.Context, projectID int, userID int) (task_service.ResolveTasksByProjectResp, error)
 }
 
 type projectService interface {

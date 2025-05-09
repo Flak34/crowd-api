@@ -4,6 +4,7 @@ import (
 	"context"
 	ucerrors "github.com/Flak34/crowd-api/internal/errors/usecase_errors"
 	"github.com/Flak34/crowd-api/internal/pgqueue"
+	project_model "github.com/Flak34/crowd-api/internal/project/model"
 	projectrepo "github.com/Flak34/crowd-api/internal/project/repository"
 	model "github.com/Flak34/crowd-api/internal/task/model"
 	taskrepo "github.com/Flak34/crowd-api/internal/task/repository"
@@ -14,18 +15,26 @@ import (
 	"time"
 )
 
-func (s *Service) ResolveUserTasksByProject(ctx context.Context, projectID int, userID int) ([]model.Task, error) {
+func (s *Service) ResolveUserTasksByProject(ctx context.Context, projectID int, userID int) (ResolveTasksByProjectResp, error) {
 	db := s.ep.GetDB()
-	reservedTasks, err := s.taskRepo.ListUserProjectTasks(ctx, db, projectID, userID)
-	if err != nil {
-		return nil, errors.Wrapf(ucerrors.ErrInternal, "List user project tasks: %s", err.Error())
-	}
-	if len(reservedTasks) != 0 {
-		return reservedTasks, nil
-	}
+	resp := ResolveTasksByProjectResp{}
 	project, err := s.getProject(ctx, db, projectID)
 	if err != nil {
-		return nil, err
+		return resp, err
+	}
+	reservedTasks, err := s.taskRepo.ListUserProjectTasks(ctx, db, projectID, userID)
+	if err != nil {
+		return resp, errors.Wrapf(ucerrors.ErrInternal, "List user project tasks: %s", err.Error())
+	}
+	if len(reservedTasks) != 0 {
+		resp.ReservedTasks = reservedTasks
+		var projectAnnotator project_model.ProjectAnnotator
+		projectAnnotator, err = s.getProjectAnnotator(ctx, db, projectID, userID)
+		if err != nil {
+			return resp, err
+		}
+		resp.AnnotationDeadline = projectAnnotator.CreatedAt.UTC().Add(project.AnnotatorTimeLimit).UTC()
+		return resp, nil
 	}
 	err = s.ep.TxWrapper(ctx, func(ctx context.Context, tx pgx.Tx) error {
 		reservedTasks, err = s.taskRepo.ReserveTasks(ctx, tx, taskrepo.ReserveTasksDTO{
@@ -56,8 +65,10 @@ func (s *Service) ResolveUserTasksByProject(ctx context.Context, projectID int, 
 		return err
 	})
 	if err != nil {
-		return reservedTasks, err
+		return resp, err
 	}
 
-	return reservedTasks, nil
+	resp.ReservedTasks = reservedTasks
+	resp.AnnotationDeadline = time.Now().UTC().Add(project.AnnotatorTimeLimit).UTC()
+	return resp, nil
 }
