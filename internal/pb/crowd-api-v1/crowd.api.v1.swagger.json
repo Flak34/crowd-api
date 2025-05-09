@@ -16,28 +16,6 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/ping": {
-      "get": {
-        "operationId": "CrowdAPIV1_Ping",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1PingResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "tags": [
-          "CrowdAPIV1"
-        ]
-      }
-    },
     "/api/v1/projects": {
       "post": {
         "summary": "Projects\r\n////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
@@ -64,6 +42,69 @@
             "schema": {
               "$ref": "#/definitions/v1CreateProjectRequest"
             }
+          }
+        ],
+        "tags": [
+          "CrowdAPIV1"
+        ]
+      }
+    },
+    "/api/v1/projects/list": {
+      "post": {
+        "operationId": "CrowdAPIV1_ListProjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListProjectsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ListProjectsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CrowdAPIV1"
+        ]
+      }
+    },
+    "/api/v1/projects/{id}": {
+      "get": {
+        "operationId": "CrowdAPIV1_GetProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetProjectResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -119,6 +160,18 @@
         "userId": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "ListProjectsRequestProjectFilter": {
+      "type": "object",
+      "properties": {
+        "creatorId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "status": {
+          "type": "string"
         }
       }
     },
@@ -194,8 +247,104 @@
         }
       }
     },
-    "v1PingResponse": {
-      "type": "object"
+    "v1GetProjectResponse": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "$ref": "#/definitions/v1Project"
+        }
+      }
+    },
+    "v1ListProjectsRequest": {
+      "type": "object",
+      "properties": {
+        "filter": {
+          "$ref": "#/definitions/ListProjectsRequestProjectFilter"
+        },
+        "page": {
+          "$ref": "#/definitions/v1Page"
+        },
+        "sort": {
+          "$ref": "#/definitions/v1Sort"
+        }
+      }
+    },
+    "v1ListProjectsResponse": {
+      "type": "object",
+      "properties": {
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Project"
+          }
+        },
+        "page": {
+          "$ref": "#/definitions/v1PageResponse"
+        }
+      }
+    },
+    "v1Page": {
+      "type": "object",
+      "properties": {
+        "pageNum": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "perPage": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1PageResponse": {
+      "type": "object",
+      "properties": {
+        "pagesCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Project": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "creatorId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "description": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "instruction": {
+          "type": "string"
+        },
+        "targetOverlap": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "tasksPerUser": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "annotatorTimeLimit": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
     },
     "v1ResolveTasksByProjectResponse": {
       "type": "object",
@@ -209,6 +358,17 @@
         }
       }
     },
+    "v1Sort": {
+      "type": "object",
+      "properties": {
+        "sortField": {
+          "type": "string"
+        },
+        "desc": {
+          "type": "boolean"
+        }
+      }
+    },
     "v1UserTask": {
       "type": "object",
       "properties": {
@@ -219,7 +379,8 @@
         "inputData": {
           "type": "string"
         }
-      }
+      },
+      "title": "MODELS"
     }
   }
 }

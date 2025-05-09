@@ -19,20 +19,22 @@ func (r *Repository) CreateProject(ctx context.Context, db entrypoint.Database, 
 		             task_config, 
 		             target_overlap, 
 		             tasks_per_user, 
-		             annotator_time_limit)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		             annotator_time_limit,
+		             status_id)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, (SELECT id FROM project_status WHERE name = $9))
 		RETURNING id`
-	projectTable := mapProjectModelToTable(project)
+	configRow := mapProjectConfigToConfigRow(project.Config)
 	var id int
 	err := pgxscan.Get(ctx, db, &id, query,
-		projectTable.CreatorID,
-		projectTable.Description,
-		projectTable.Name,
-		projectTable.Instruction,
-		projectTable.Config,
-		projectTable.TargetOverlap,
-		projectTable.TasksPerUser,
-		projectTable.AnnotatorTimeLimit)
+		project.CreatorID,
+		project.Description,
+		project.Name,
+		project.Instruction,
+		configRow,
+		project.TargetOverlap,
+		project.TasksPerUser,
+		project.AnnotatorTimeLimit,
+		project.Status)
 	if err != nil {
 		return id, errors.Errorf("create project: %s", err.Error())
 	}

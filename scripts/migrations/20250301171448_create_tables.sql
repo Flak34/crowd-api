@@ -14,9 +14,20 @@ CREATE TABLE IF NOT EXISTS task (
 );
 CREATE INDEX project_id_idx ON task(project_id);
 
+CREATE TABLE IF NOT EXISTS project_status (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
+INSERT INTO project_status(name) VALUES
+                                    ('created'),
+                                    ('active'),
+                                    ('finished');
+
 CREATE TABLE IF NOT EXISTS project (
     id SERIAL PRIMARY KEY,
     creator_id INTEGER NOT NULL,
+    status_id INTEGER NOT NULL,
     description TEXT NOT NULL,
     name TEXT NOT NULL,
     instruction TEXT NOT NULL,
@@ -66,5 +77,5 @@ CREATE TABLE IF NOT EXISTS person_role (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS task, project, task_annotation, project_annotator, person, role, person_role;
+DROP TABLE IF EXISTS task, project, task_annotation, project_annotator, person, role, person_role, project_status;
 -- +goose StatementEnd

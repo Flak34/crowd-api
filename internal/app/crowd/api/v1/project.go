@@ -23,21 +23,20 @@ type ProjectDTO struct {
 }
 
 type ProjectConfigDTO struct {
-	InputData  []InputDataDTO  `json:"input_data"`
-	OutputData []OutputDataDTO `json:"output_data"`
+	InputData        []InputDataDTO  `json:"inputData"`
+	OutputData       []OutputDataDTO `json:"outputData"`
+	SerializedLayout string          `json:"serializedLayout"`
 }
 
 type InputDataDTO struct {
-	Type       string `json:"type"`
-	Name       string `json:"name"`
-	IsRequired bool   `json:"is_required"`
+	Type string `json:"type"`
+	Name string `json:"name"`
 }
 
 type OutputDataDTO struct {
 	Type            string `json:"type"`
 	Name            string `json:"name"`
-	IsRequired      bool   `json:"is_required"`
-	WithAggregation bool   `json:"with_aggregation"`
+	WithAggregation bool   `json:"withAggregation"`
 }
 
 func protoToProjectDTO(req *crowdapiv1.CreateProjectRequest) (ProjectDTO, error) {
@@ -89,9 +88,8 @@ func projectDTOToModel(dto ProjectDTO) model.Project {
 			InputData: lo.Map(dto.Config.InputData,
 				func(data InputDataDTO, _ int) model.InputData {
 					return model.InputData{
-						Type:       model.DataType(data.Type),
-						Name:       data.Name,
-						IsRequired: data.IsRequired,
+						Type: model.DataType(data.Type),
+						Name: data.Name,
 					}
 				}),
 			OutputData: lo.Map(dto.Config.OutputData,
@@ -99,15 +97,14 @@ func projectDTOToModel(dto ProjectDTO) model.Project {
 					return model.OutputData{
 						Type:            model.DataType(data.Type),
 						Name:            data.Name,
-						IsRequired:      data.IsRequired,
 						WithAggregation: data.WithAggregation,
 					}
 				}),
+			Layout: dto.Config.SerializedLayout,
 		},
 		TargetOverlap:      dto.TargetOverlap,
 		TasksPerUser:       dto.TasksPerUser,
 		CreatedAt:          dto.CreatedAt,
 		AnnotatorTimeLimit: dto.AnnotatorTimeLimit,
 	}
-
 }

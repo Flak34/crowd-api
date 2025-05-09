@@ -13,18 +13,21 @@ import (
 func (r *Repository) GetProject(ctx context.Context, db entrypoint.Database, projectID int) (model.Project, error) {
 	var query = `
 		SELECT 
-		    id, 
-		    creator_id,
-		    description,
-		    name,
-		    instruction,
-		    task_config, 
-		    target_overlap, 
-		    tasks_per_user, 
-		    created_at,
-		    annotator_time_limit
+		    project.id, 
+		    project.creator_id,
+		    project.description,
+		    project.name,
+		    project.instruction,
+		    project.task_config, 
+		    project.target_overlap, 
+		    project.tasks_per_user, 
+		    project.created_at,
+		    project.status_id,
+		    project.annotator_time_limit,
+			project_status.name AS status_name
 		FROM project
-		WHERE id = $1`
+		LEFT JOIN project_status ON project_status.id = project.status_id
+		WHERE project.id = $1`
 	var project ProjectTable
 	err := pgxscan.Get(ctx, db, &project, query, projectID)
 	if err != nil {

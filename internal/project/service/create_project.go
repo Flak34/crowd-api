@@ -13,6 +13,7 @@ func (s *Service) CreateProject(ctx context.Context, project model.Project) (int
 	if err != nil {
 		return 0, err
 	}
+	project.Status = model.ProjectCreatedStatusName
 	id, err := s.projectRepo.CreateProject(ctx, db, project)
 	if err != nil {
 		return 0, errors.Wrapf(uscerrors.ErrInternal, "create project: %v", err)

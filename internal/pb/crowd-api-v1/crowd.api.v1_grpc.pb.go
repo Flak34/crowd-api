@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	CrowdAPIV1_Ping_FullMethodName                  = "/crowd.api.v1.CrowdAPIV1/Ping"
 	CrowdAPIV1_ResolveTasksByProject_FullMethodName = "/crowd.api.v1.CrowdAPIV1/ResolveTasksByProject"
 	CrowdAPIV1_CreateProject_FullMethodName         = "/crowd.api.v1.CrowdAPIV1/CreateProject"
+	CrowdAPIV1_ListProjects_FullMethodName          = "/crowd.api.v1.CrowdAPIV1/ListProjects"
+	CrowdAPIV1_GetProject_FullMethodName            = "/crowd.api.v1.CrowdAPIV1/GetProject"
 	CrowdAPIV1_CreateAnnotations_FullMethodName     = "/crowd.api.v1.CrowdAPIV1/CreateAnnotations"
 )
 
@@ -29,7 +30,6 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CrowdAPIV1Client interface {
-	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
 	// Tasks
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Get tasks by project id. This method reserves tasks for the user.
@@ -37,6 +37,8 @@ type CrowdAPIV1Client interface {
 	// Projects
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectResponse, error)
+	ListProjects(ctx context.Context, in *ListProjectsRequest, opts ...grpc.CallOption) (*ListProjectsResponse, error)
+	GetProject(ctx context.Context, in *GetProjectRequest, opts ...grpc.CallOption) (*GetProjectResponse, error)
 	// Annotations
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	CreateAnnotations(ctx context.Context, in *CreateAnnotationsRequest, opts ...grpc.CallOption) (*CreateAnnotationsResponse, error)
@@ -48,15 +50,6 @@ type crowdAPIV1Client struct {
 
 func NewCrowdAPIV1Client(cc grpc.ClientConnInterface) CrowdAPIV1Client {
 	return &crowdAPIV1Client{cc}
-}
-
-func (c *crowdAPIV1Client) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error) {
-	out := new(PingResponse)
-	err := c.cc.Invoke(ctx, CrowdAPIV1_Ping_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *crowdAPIV1Client) ResolveTasksByProject(ctx context.Context, in *ResolveTasksByProjectRequest, opts ...grpc.CallOption) (*ResolveTasksByProjectResponse, error) {
@@ -77,6 +70,24 @@ func (c *crowdAPIV1Client) CreateProject(ctx context.Context, in *CreateProjectR
 	return out, nil
 }
 
+func (c *crowdAPIV1Client) ListProjects(ctx context.Context, in *ListProjectsRequest, opts ...grpc.CallOption) (*ListProjectsResponse, error) {
+	out := new(ListProjectsResponse)
+	err := c.cc.Invoke(ctx, CrowdAPIV1_ListProjects_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *crowdAPIV1Client) GetProject(ctx context.Context, in *GetProjectRequest, opts ...grpc.CallOption) (*GetProjectResponse, error) {
+	out := new(GetProjectResponse)
+	err := c.cc.Invoke(ctx, CrowdAPIV1_GetProject_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *crowdAPIV1Client) CreateAnnotations(ctx context.Context, in *CreateAnnotationsRequest, opts ...grpc.CallOption) (*CreateAnnotationsResponse, error) {
 	out := new(CreateAnnotationsResponse)
 	err := c.cc.Invoke(ctx, CrowdAPIV1_CreateAnnotations_FullMethodName, in, out, opts...)
@@ -90,7 +101,6 @@ func (c *crowdAPIV1Client) CreateAnnotations(ctx context.Context, in *CreateAnno
 // All implementations must embed UnimplementedCrowdAPIV1Server
 // for forward compatibility
 type CrowdAPIV1Server interface {
-	Ping(context.Context, *PingRequest) (*PingResponse, error)
 	// Tasks
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Get tasks by project id. This method reserves tasks for the user.
@@ -98,6 +108,8 @@ type CrowdAPIV1Server interface {
 	// Projects
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error)
+	ListProjects(context.Context, *ListProjectsRequest) (*ListProjectsResponse, error)
+	GetProject(context.Context, *GetProjectRequest) (*GetProjectResponse, error)
 	// Annotations
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	CreateAnnotations(context.Context, *CreateAnnotationsRequest) (*CreateAnnotationsResponse, error)
@@ -108,14 +120,17 @@ type CrowdAPIV1Server interface {
 type UnimplementedCrowdAPIV1Server struct {
 }
 
-func (UnimplementedCrowdAPIV1Server) Ping(context.Context, *PingRequest) (*PingResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
-}
 func (UnimplementedCrowdAPIV1Server) ResolveTasksByProject(context.Context, *ResolveTasksByProjectRequest) (*ResolveTasksByProjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResolveTasksByProject not implemented")
 }
 func (UnimplementedCrowdAPIV1Server) CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateProject not implemented")
+}
+func (UnimplementedCrowdAPIV1Server) ListProjects(context.Context, *ListProjectsRequest) (*ListProjectsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListProjects not implemented")
+}
+func (UnimplementedCrowdAPIV1Server) GetProject(context.Context, *GetProjectRequest) (*GetProjectResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProject not implemented")
 }
 func (UnimplementedCrowdAPIV1Server) CreateAnnotations(context.Context, *CreateAnnotationsRequest) (*CreateAnnotationsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAnnotations not implemented")
@@ -131,24 +146,6 @@ type UnsafeCrowdAPIV1Server interface {
 
 func RegisterCrowdAPIV1Server(s grpc.ServiceRegistrar, srv CrowdAPIV1Server) {
 	s.RegisterService(&CrowdAPIV1_ServiceDesc, srv)
-}
-
-func _CrowdAPIV1_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CrowdAPIV1Server).Ping(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CrowdAPIV1_Ping_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CrowdAPIV1Server).Ping(ctx, req.(*PingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _CrowdAPIV1_ResolveTasksByProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -187,6 +184,42 @@ func _CrowdAPIV1_CreateProject_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CrowdAPIV1_ListProjects_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListProjectsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CrowdAPIV1Server).ListProjects(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CrowdAPIV1_ListProjects_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CrowdAPIV1Server).ListProjects(ctx, req.(*ListProjectsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CrowdAPIV1_GetProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProjectRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CrowdAPIV1Server).GetProject(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CrowdAPIV1_GetProject_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CrowdAPIV1Server).GetProject(ctx, req.(*GetProjectRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CrowdAPIV1_CreateAnnotations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateAnnotationsRequest)
 	if err := dec(in); err != nil {
@@ -213,16 +246,20 @@ var CrowdAPIV1_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*CrowdAPIV1Server)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Ping",
-			Handler:    _CrowdAPIV1_Ping_Handler,
-		},
-		{
 			MethodName: "ResolveTasksByProject",
 			Handler:    _CrowdAPIV1_ResolveTasksByProject_Handler,
 		},
 		{
 			MethodName: "CreateProject",
 			Handler:    _CrowdAPIV1_CreateProject_Handler,
+		},
+		{
+			MethodName: "ListProjects",
+			Handler:    _CrowdAPIV1_ListProjects_Handler,
+		},
+		{
+			MethodName: "GetProject",
+			Handler:    _CrowdAPIV1_GetProject_Handler,
 		},
 		{
 			MethodName: "CreateAnnotations",

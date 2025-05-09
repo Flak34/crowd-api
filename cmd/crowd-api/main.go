@@ -71,7 +71,7 @@ func main() {
 
 	// Initializing services
 	taskService := task_service.New(ep, taskRepo, projectRepo, pgqClient)
-	projectService := project_service.New(ep, projectRepo)
+	projectService := project_service.New(ep, projectRepo, taskRepo)
 	userService := user_service.New(ep, userRepo)
 
 	// Registering workers
@@ -102,7 +102,7 @@ func main() {
 	}()
 
 	// Setup and start gRPC gateway server
-	httpServer := setupHTTPServer(ctx)
+	httpServer := setupHTTPServer(ctx, projectService)
 	go func() {
 		log.Info().Msg("starting HTTP server")
 		if err = httpServer.ListenAndServe(); err != nil {
@@ -155,7 +155,7 @@ func setupRiverUIServer(ctx context.Context, riverClient *river.Client[pgx.Tx], 
 	return server
 }
 
-func setupHTTPServer(ctx context.Context) *http.Server {
+func setupHTTPServer(ctx context.Context, projectSvc *project_service.Service) *http.Server {
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -165,6 +165,15 @@ func setupHTTPServer(ctx context.Context) *http.Server {
 	}
 	if err := auth_v1.RegisterAuthV1HandlerFromEndpoint(ctx, mux, grpcServerAddress, opts); err != nil {
 		log.Fatal().Err(err).Msg("failed to register http handlers")
+	}
+	// Регистрация http handler-a для загрузки файла, т.к. grpc-gateway не умеет в загрузку файлов :sad_blob:
+	err := mux.HandlePath(
+		"POST",
+		"/api/v1/projects/{id}/data/upload",
+		crowdapiv1.NewUploadInputDataHandler(projectSvc),
+	)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to register http upload data handler")
 	}
 	muxWithCors := cors.New(cors.Options{
 		AllowOriginFunc: func(origin string) bool {
