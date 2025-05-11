@@ -18,8 +18,9 @@ type DataRow struct {
 }
 
 type OutputDataRow struct {
-	Name string `json:"name"`
-	Data string `json:"data"`
+	Name  string `json:"name"`
+	Value string `json:"value"`
+	Type  string `json:"type"`
 }
 
 func mapAnnotationModelToTable(annotation model.Annotation) AnnotationTable {
@@ -28,26 +29,17 @@ func mapAnnotationModelToTable(annotation model.Annotation) AnnotationTable {
 		AnnotatorID: annotation.AnnotatorID,
 		CreatedAt:   annotation.CreatedAt,
 		Data: DataRow{
-			OutputData: lo.Map(annotation.OutputData, func(data model.AnnotationOutputData, _ int) OutputDataRow {
-				return OutputDataRow{
-					Name: data.Name,
-					Data: data.Data,
-				}
+			OutputData: lo.Map(annotation.OutputData, func(data model.OutputData, _ int) OutputDataRow {
+				return mapOutputDataToDataRow(data)
 			}),
 		},
 	}
 }
 
-func mapAnnotationTableToModel(annotation AnnotationTable) model.Annotation {
-	return model.Annotation{
-		TaskID:      annotation.TaskID,
-		AnnotatorID: annotation.AnnotatorID,
-		CreatedAt:   annotation.CreatedAt,
-		OutputData: lo.Map(annotation.Data.OutputData, func(data OutputDataRow, _ int) model.AnnotationOutputData {
-			return model.AnnotationOutputData{
-				Name: data.Name,
-				Data: data.Data,
-			}
-		}),
+func mapOutputDataToDataRow(outputData model.OutputData) OutputDataRow {
+	return OutputDataRow{
+		Name:  outputData.Name,
+		Value: outputData.Value,
+		Type:  outputData.Type,
 	}
 }

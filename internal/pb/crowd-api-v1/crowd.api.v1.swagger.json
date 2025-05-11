@@ -16,6 +16,39 @@
     "application/json"
   ],
   "paths": {
+    "/api/v1/annotations": {
+      "post": {
+        "summary": "Annotations\r\n////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
+        "operationId": "CrowdAPIV1_CreateAnnotations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateAnnotationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateAnnotationsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CrowdAPIV1"
+        ]
+      }
+    },
     "/api/v1/projects": {
       "post": {
         "summary": "Projects\r\n////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
@@ -218,6 +251,22 @@
         }
       }
     },
+    "v1CreateAnnotationsRequest": {
+      "type": "object",
+      "properties": {
+        "annotatorId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "annotations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TaskAnnotation"
+          }
+        }
+      }
+    },
     "v1CreateAnnotationsResponse": {
       "type": "object"
     },
@@ -402,6 +451,18 @@
         },
         "desc": {
           "type": "boolean"
+        }
+      }
+    },
+    "v1TaskAnnotation": {
+      "type": "object",
+      "properties": {
+        "taskId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "outputData": {
+          "type": "string"
         }
       }
     }

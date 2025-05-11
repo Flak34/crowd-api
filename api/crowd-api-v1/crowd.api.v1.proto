@@ -42,7 +42,10 @@ service CrowdAPIV1 {
   // Annotations
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   rpc CreateAnnotations(CreateAnnotationsRequest) returns (CreateAnnotationsResponse) {
-
+    option (google.api.http) = {
+      post: "/api/v1/annotations"
+      body: "*"
+    };
   }
 }
 
@@ -96,11 +99,11 @@ message GetProjectResponse {
 }
 
 message CreateAnnotationsRequest {
-
+  int32 annotator_id = 1;
+  repeated TaskAnnotation annotations = 2;
 }
 
 message CreateAnnotationsResponse {
-
 }
 
 // MODELS
@@ -126,6 +129,11 @@ message AnnotatorTask {
   string input_data = 5;
   string output_data = 6;
   google.protobuf.Timestamp created_at = 7;
+}
+
+message TaskAnnotation {
+  int32 task_id = 1;
+  string output_data = 2;
 }
 
 message Sort {

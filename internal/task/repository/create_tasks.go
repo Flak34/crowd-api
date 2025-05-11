@@ -27,10 +27,10 @@ func (r *Repository) CreateTasks(ctx context.Context, db entrypoint.Database, ta
 		insB.Values(task.ProjectID, task.TargetOverlap, task.CurrentOverlap, inputData, outputData)
 	}
 	query, args := insB.Build()
-	rows, err := db.Query(ctx, query, args...)
-	if err != nil {
-		return err
-	}
+	rows, _ := db.Query(ctx, query, args...)
 	rows.Close()
+	if rows.Err() != nil {
+		return rows.Err()
+	}
 	return nil
 }

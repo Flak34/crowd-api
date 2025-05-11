@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	annotation_repository "github.com/Flak34/crowd-api/internal/annotation/repository"
+	annotation_service "github.com/Flak34/crowd-api/internal/annotation/service"
 	authv1 "github.com/Flak34/crowd-api/internal/app/auth/v1"
 	crowdapiv1 "github.com/Flak34/crowd-api/internal/app/crowd/api/v1"
 	"github.com/Flak34/crowd-api/internal/entrypoint"
@@ -68,11 +70,13 @@ func main() {
 	taskRepo := task_repository.New()
 	projectRepo := project_repository.New()
 	userRepo := user_repository.New()
+	annotationsRepo := annotation_repository.New()
 
 	// Initializing services
 	taskService := task_service.New(ep, taskRepo, projectRepo, pgqClient)
 	projectService := project_service.New(ep, projectRepo, taskRepo)
 	userService := user_service.New(ep, userRepo)
+	annotationsService := annotation_service.New(ep, taskRepo, annotationsRepo, projectRepo)
 
 	// Registering workers
 	river.AddWorker(pgqWorkers, pgqueue.NewAnnotationDeadlineHandler(taskService))
@@ -93,7 +97,7 @@ func main() {
 	}()
 
 	// Setup and start gRPC server
-	grpcServer, listener := setupGRPCServer(taskService, projectService, userService)
+	grpcServer, listener := setupGRPCServer(taskService, projectService, userService, annotationsService)
 	go func() {
 		log.Info().Msg("starting gRPC server")
 		if err = grpcServer.Serve(listener); err != nil {
@@ -121,13 +125,14 @@ func setupGRPCServer(
 	taskSvc *task_service.Service,
 	projectSvc *project_service.Service,
 	userService *user_service.Service,
+	annotationSvc *annotation_service.Service,
 ) (*grpc.Server, net.Listener) {
 	server := grpc.NewServer()
 	listener, err := net.Listen("tcp", grpcServerAddress)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to start net listener")
 	}
-	crowdAPIV1Service := crowdapiv1.NewCrowdAPIV1(taskSvc, projectSvc)
+	crowdAPIV1Service := crowdapiv1.NewCrowdAPIV1(taskSvc, projectSvc, annotationSvc)
 	authV1Service := authv1.NewAuthV1(userService)
 	crowd_api_v1.RegisterCrowdAPIV1Server(server, crowdAPIV1Service)
 	auth_v1.RegisterAuthV1Server(server, authV1Service)

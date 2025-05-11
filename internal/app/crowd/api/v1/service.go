@@ -2,6 +2,7 @@ package crowdapiv1
 
 import (
 	"context"
+	model "github.com/Flak34/crowd-api/internal/annotation/model"
 	crowdapiv1 "github.com/Flak34/crowd-api/internal/pb/crowd-api-v1"
 	projectmodel "github.com/Flak34/crowd-api/internal/project/model"
 	projectservice "github.com/Flak34/crowd-api/internal/project/service"
@@ -20,15 +21,26 @@ type projectService interface {
 	UploadProjectData(ctx context.Context, projectID int, dataReader io.Reader) error
 }
 
-type Implementation struct {
-	crowdapiv1.UnimplementedCrowdAPIV1Server
-	taskService    taskService
-	projectService projectService
+type annotationsService interface {
+	CreateAnnotations(ctx context.Context, annotations ...model.Annotation) error
 }
 
-func NewCrowdAPIV1(taskService taskService, projectService projectService) *Implementation {
+type Implementation struct {
+	crowdapiv1.UnimplementedCrowdAPIV1Server
+
+	taskService        taskService
+	projectService     projectService
+	annotationsService annotationsService
+}
+
+func NewCrowdAPIV1(
+	taskService taskService,
+	projectService projectService,
+	annotationsService annotationsService,
+) *Implementation {
 	return &Implementation{
-		taskService:    taskService,
-		projectService: projectService,
+		taskService:        taskService,
+		projectService:     projectService,
+		annotationsService: annotationsService,
 	}
 }

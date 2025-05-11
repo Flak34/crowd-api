@@ -103,7 +103,6 @@ func (s *Service) getTasksMap(
 func (s *Service) createAnnotations(ctx context.Context, userID int, annotations []model.Annotation, taskIDs []int) error {
 	err := s.ep.TxWrapper(ctx, func(ctx context.Context, tx pgx.Tx) error {
 		err := s.annotationRepo.CreateAnnotations(ctx, tx, annotations...)
-		// TODO добавить проверку на нарушение уникальности pk (task_id, annotator_id)
 		if err != nil {
 			return errors.Wrapf(uscerrors.ErrInternal, "Create annotations: %s", err.Error())
 		}

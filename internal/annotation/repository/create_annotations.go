@@ -8,6 +8,7 @@ import (
 	"github.com/huandu/go-sqlbuilder"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/pkg/errors"
+	"github.com/samber/lo"
 )
 
 const (
@@ -29,7 +30,9 @@ func (r *Repository) CreateAnnotations(
 		insBuilder.Values(
 			annotation.TaskID,
 			annotation.AnnotatorID,
-			annotation.OutputData,
+			lo.Map(annotation.OutputData, func(data model.OutputData, _ int) OutputDataRow {
+				return mapOutputDataToDataRow(data)
+			}),
 		)
 	}
 	q, args := insBuilder.Build()

@@ -6,10 +6,11 @@ type Annotation struct {
 	TaskID      int
 	AnnotatorID int
 	CreatedAt   time.Time
-	OutputData  []AnnotationOutputData
+	OutputData  []OutputData
 }
 
-type AnnotationOutputData struct {
-	Name string
-	Data string
+type OutputData struct {
+	Name  string
+	Value string
+	Type  string
 }
